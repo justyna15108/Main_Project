@@ -172,9 +172,7 @@ class Show_Partia extends Component {
                 console.log("Unknown");
                 break;
         }
-        this.validateData();
     }
-
 
 
     render() {
@@ -228,7 +226,7 @@ class Show_Partia extends Component {
                         </FormGroup>
                     </Col>
                 </Row>
-                {this.state.Status == "w sprzedazy" &&
+                {this.state.Status == "przyjęta" &&
                     <Row>
                         <div style={{ height: '500px', width: "100%" }} className="ag-theme-balham">
                             <AgGridReact

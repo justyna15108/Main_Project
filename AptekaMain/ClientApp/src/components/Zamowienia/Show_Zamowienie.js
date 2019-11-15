@@ -12,7 +12,7 @@ class Show_Zamowienie extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            zamowienie: '', hurtowni: [],partii: [], loading_data: true, loading_table: true,
+            zamowienie: '', hurtowni: [], partii: [], loading_data: true, loading_table: true,
             columnDefs: [],
             rowData: [],
             context: { componentParent: this },
@@ -21,7 +21,7 @@ class Show_Zamowienie extends Component {
             payment_date: '',
             receive_date: '',
             hurtownia: '',
-            status: "Oczekiwane",
+            status: "zlozone",
             oplacone: 1,
         };
 
@@ -34,6 +34,8 @@ class Show_Zamowienie extends Component {
         this.handleUpdate = this.handleUpdate.bind(this);
         this.getShortDate = this.getShortDate.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleAccept = this.handleAccept.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     async componentDidMount() {
@@ -103,7 +105,8 @@ class Show_Zamowienie extends Component {
                 Status: par.Status,
                 DataWaznosci: this.getShortDate(par.DataWaznosci),
                 CenaWZakupu: this.getShortDate(par.dataDostawy),
-                CenaWSprzedazy: par.CenaWZakupu,
+                CenaWSprzedazy: par.CenaWSprzedazy,
+                CenaWZakupu: par.CenaWZakupu,
                 Liczba: par.Liczba
             }
 
@@ -147,7 +150,7 @@ class Show_Zamowienie extends Component {
     }
 
     handleRedirect(cell) {
-
+        //zlozone
         //alert(cell);
         this.props.history.push('/artykul_edit/' + cell);
     }
@@ -162,14 +165,34 @@ class Show_Zamowienie extends Component {
                 idZamowienia: this.state.zamowienie.idZamowienia,
                 dataZamowienia: this.state.order_date,
                 dataOplaty: this.state.payment_date,
-                dataDostawy: this.state.receive_date, 
+                dataDostawy: this.state.receive_date,
                 sumaZamowienia: this.state.zamowienie.sumaZamowienia,
                 hurtowniaIdHurtowni: this.state.zamowienie.hurtowniaIdHurtowni,
                 oplacono: this.state.oplacone,
                 status: this.state.zamowienie.status
             })
-        }).then(resp=> console.log(resp.status)).then(setTimeout(this.refresh, 300));
+        }).then(resp => console.log(resp.status)).then(setTimeout(this.refresh, 300));
     }
+
+    handleCancel() {
+        fetch("api/Zamowienies/" + this.state.zamowienie.idZamowienia, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                idZamowienia: this.state.zamowienie.idZamowienia,
+                dataZamowienia: this.state.order_date,
+                dataOplaty: this.state.payment_date,
+                dataDostawy: this.state.receive_date,
+                sumaZamowienia: this.state.zamowienie.sumaZamowienia,
+                hurtowniaIdHurtowni: this.state.zamowienie.hurtowniaIdHurtowni,
+                oplacono: this.state.oplacone,
+                status: "odwołano"
+            })
+        }).then(resp => console.log(resp.status)).then(setTimeout(this.refresh, 300));
+    }
+
 
     onSelectionChanged() {
         let selectedRows = this.gridApi.getSelectedRows();
@@ -178,7 +201,7 @@ class Show_Zamowienie extends Component {
     }
 
     handleInputChange(event) {
-      this.setState({ oplacone: event.target.checked });
+        this.setState({ oplacone: event.target.checked });
     }
 
     handleOrderDateChange = date => {
@@ -199,50 +222,81 @@ class Show_Zamowienie extends Component {
         });
     }
 
+    handleAccept() {
+
+        fetch("api/Zamowienies/" + this.state.zamowienie.idZamowienia, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                idZamowienia: this.state.zamowienie.idZamowienia,
+                dataZamowienia: this.state.order_date,
+                dataOplaty: this.state.payment_date,
+                dataDostawy: this.state.receive_date,
+                sumaZamowienia: this.state.zamowienie.sumaZamowienia,
+                hurtowniaIdHurtowni: this.state.zamowienie.hurtowniaIdHurtowni,
+                oplacono: this.state.oplacone,
+                status: "W sprzedaży"
+            })
+        }).then(resp => console.log(resp.status)).then(
+        this.props.history.push({
+            pathname: '/accept_partia',
+            state: { partii: this.state.partii, length: this.state.partii.length - 1, current_location: 0 }
+        })
+        );
+    }
+
     render() {
         return (
             <Container fluid>
-                    <Row>
-                        <Col>
-                            <Form>
-                                <FormGroup>
-                                    <Label htmlFor="hurtownia">Hurtownia</Label>
+                <Row>
+                    <Col>
+                        <FormGroup>
+                            <Label htmlFor="Status">Status Zamowienia</Label>
+                            <p className="form-control" name="Status"> {this.state.status} </p>
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <Form>
+                            <FormGroup>
+                                <Label htmlFor="hurtownia">Hurtownia</Label>
                                 <p className="form-control" name="hurtownia"> {this.state.hurtownia} </p>
-                                </FormGroup>
-                            </Form>
-                        </Col>
-                        <Col>
-                            <FormGroup>
-                                <Label>Data zamowienia</Label>
-                                <DatePicker
-                                    selected={this.state.order_date}
-                                    onChange={this.handleOrderDateChange}
-                                />
                             </FormGroup>
-                        </Col>
-                        <Col>
-                            <FormGroup>
-                                <Label>Data Opłaty</Label>
-                                <DatePicker
-                                    selected={this.state.payment_date}
-                                    onChange={this.handlePaymentDateChange}
-                                />
-                            </FormGroup>
-                        </Col>
-                        <Col>
-                            <FormGroup>
-                                <Label>Data dotawy</Label>
-                                <DatePicker
-                                    selected={this.state.receive_date}
-                                    onChange={this.handleReceiveDateChange}
-                                />
-                            </FormGroup>
-                        </Col>
-                        <Col>
-                            <FormGroup>
-                                <Label htmlFor="wartosc" >Lączna Wartość</Label>
+                        </Form>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label>Data zamowienia</Label>
+                            <DatePicker
+                                selected={this.state.order_date}
+                                onChange={this.handleOrderDateChange}
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label>Data Opłaty</Label>
+                            <DatePicker
+                                selected={this.state.payment_date}
+                                onChange={this.handlePaymentDateChange}
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label>Data dotawy</Label>
+                            <DatePicker
+                                selected={this.state.receive_date}
+                                onChange={this.handleReceiveDateChange}
+                            />
+                        </FormGroup>
+                    </Col>
+                    <Col>
+                        <FormGroup>
+                            <Label htmlFor="wartosc" >Lączna Wartość</Label>
                             <p className="form-control" name="wartosc"> {this.state.wartosc} </p>
-                            </FormGroup>
+                        </FormGroup>
                     </Col>
                     <Col>
                         <FormGroup>
@@ -250,38 +304,40 @@ class Show_Zamowienie extends Component {
                             <Input type="checkbox" className="form-control" name="oplacone" checked={this.state.oplacone} onChange={this.handleInputChange} />
                         </FormGroup>
                     </Col>
+                </Row>
+                <Row>
+                    <div style={{ height: '500px', width: "100%" }} className="ag-theme-balham">
+                        <AgGridReact
+                            columnDefs={this.state.columnDefs}
+                            rowData={this.state.rowData}
+                            context={this.state.context}
+                            frameworkComponents={this.state.frameworkComponents}
+                            onGridReady={this.onGridReady}
+                            rowSelection={this.state.rowSelection}
+                            onSelectionChanged={this.onSelectionChanged.bind(this)}
+                        />
+                    </div>
+                </Row>
+                <Row>
                     <Col>
-                    <FormGroup>
-                        <Button className="btn btn-primary" type="button" onClick={this.handleUpdate}>Zapisz zmiany</Button>
+                        <FormGroup>
+                            <Button className="btn btn-primary" type="button" onClick={this.handleUpdate}>Zapisz zmiany</Button>
                         </FormGroup>
+                    </Col>
+                    {this.state.status == "zlozone" && <div>
+                        <Col>
+                            <FormGroup>
+                                <Button className="btn btn-primary" type="button" onClick={this.handleCancel}>Odrzyć zamowienie</Button>
+                            </FormGroup>
                         </Col>
+                        <Col>
+                            <FormGroup>
+                                <Button className="btn btn-primary" type="button" onClick={this.handleAccept}>Przjmij zamowienie</Button>
+                            </FormGroup>
+                        </Col>
+                    </div>
+                    }
                 </Row>
-                    <Row>
-                        <div style={{ height: '500px', width: "100%" }} className="ag-theme-balham">
-                            <AgGridReact
-                                columnDefs={this.state.columnDefs}
-                                rowData={this.state.rowData}
-                                context={this.state.context}
-                                frameworkComponents={this.state.frameworkComponents}
-                                onGridReady={this.onGridReady}
-                                rowSelection={this.state.rowSelection}
-                                onSelectionChanged={this.onSelectionChanged.bind(this)}
-                            />
-                        </div>
-                    </Row>
-                {this.state.status == "Oczekiwane" && <Row>
-                    <Col>
-                        <FormGroup>
-                            <Button className="btn btn-primary" type="button" onClick={this.handleUpdate}>Odzyc zamowienie</Button>
-                        </FormGroup>
-                    </Col>
-                    <Col>
-                        <FormGroup>
-                            <Button className="btn btn-primary" type="button" onClick={this.handleUpdate}>Przjmij zamowienie</Button>
-                        </FormGroup>
-                    </Col>
-                </Row>
-                }
             </Container>
         );
     }

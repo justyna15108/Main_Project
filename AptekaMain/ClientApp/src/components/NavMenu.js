@@ -35,7 +35,7 @@ class NavMenu extends React.Component {
     render() {
         return (
             <header>
-                <Navbar className="navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" light >
+                <Navbar className="navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3 bg-primary " dark>
                     <Container fluid>
                         <NavbarBrand tag={Link} to="/">Apteka</NavbarBrand>
                         <NavbarToggler onClick={this.toggle} className="mr-2" />
@@ -57,7 +57,13 @@ class NavMenu extends React.Component {
                                     </DropdownToggle>
                                     <DropdownMenu right>
                                         <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/listy_brakow">Listy Braków</NavLink>
+                                            <NavLink tag={Link} className="text-dark" to="/lista_brakow_show">Listy Braków</NavLink>
+                                        </DropdownItem>
+                                        <DropdownItem>
+                                            <NavLink tag={Link} className="text-dark" to="/create_zamowienie">Nowe Zamowienie</NavLink>
+                                        </DropdownItem>
+                                        <DropdownItem>
+                                            <NavLink tag={Link} className="text-dark" to="/zamowienia">Zamowienia</NavLink>
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>

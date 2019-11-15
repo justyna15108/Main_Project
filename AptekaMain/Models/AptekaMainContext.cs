@@ -38,7 +38,7 @@ namespace AptekaMain.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Server=tcp:serverapteka.database.windows.net,1433;Initial Catalog=AptekaMain;User ID=apteka_admin;Password=usermain0!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;");
+                optionsBuilder.UseSqlServer("Server=tcp:aptekamain.database.windows.net,1433;Initial Catalog=AptekaMain;User ID=apteka_admin;Password=usermain0!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;");
             }
         }
 
@@ -104,7 +104,7 @@ namespace AptekaMain.Models
                     .WithMany(p => p.Batch)
                     .HasForeignKey(d => d.IdPartia)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Batch__id_partia__5224328E");
+                    .HasConstraintName("FK__Batch__id_partia__6D0D32F4");
 
                 entity.HasOne(d => d.WydzialAptekiIdWydzialuNavigation)
                     .WithMany(p => p.Batch)

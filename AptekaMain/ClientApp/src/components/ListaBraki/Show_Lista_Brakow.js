@@ -12,7 +12,7 @@ class Listy_Brakow extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            lista: '',artykuls: [],braki: [], loading_data: true, loading_table: true,
+            lista: '', artykuls: [], braki: [], loading_data: true, loading_table: true,
             columnDefs: [],
             rowData: [],
             columnDefs2: [],
@@ -44,7 +44,7 @@ class Listy_Brakow extends Component {
         await fetch('/api/ListaBrakows?$expand=braki&$orderby=dataGen desc&$top=1')
             .then(response => response.json())
             .then(data => {
-                this.setState({ lista: data[0], braki: data[0].Braki});
+                this.setState({ lista: data[0], braki: data[0].Braki });
             });
         await fetch('api/Artykuls?$select=idArtykul, nazwa, illoscPodstawowa')
             .then(response => response.json())
@@ -67,7 +67,7 @@ class Listy_Brakow extends Component {
         var arts = this.state.artykuls;
         for (var i in arts) {
             if (id === arts[i].IdArtykul)
-            return arts[i].IlloscPodstawowa;
+                return arts[i].IlloscPodstawowa;
         };
         return 0;
     }
@@ -133,7 +133,7 @@ class Listy_Brakow extends Component {
                 valueGetter: function (params) {
                     let p = params.data.illoscPodstawowa;
                     let i = params.data.illosc;
-                    let r = (p-i)*100/p;
+                    let r = (p - i) * 100 / p;
                     return parseInt(r, 10)
                 },
                 editable: false,
@@ -181,8 +181,8 @@ class Listy_Brakow extends Component {
         var selectedRows = this.gridApi1.getSelectedRows();
         var selectedRow = selectedRows[0];
         if (selectedRow) {
-        this.gridApi2.updateRowData({ add: selectedRows })
-        this.gridApi1.updateRowData({ remove: selectedRows });
+            this.gridApi2.updateRowData({ add: selectedRows })
+            this.gridApi1.updateRowData({ remove: selectedRows });
         }
         console.log(this.gridApi2);
     }
@@ -196,7 +196,7 @@ class Listy_Brakow extends Component {
             //rows.push(selectedRow);
             //this.setState({ rowData2: rows });
             this.gridApi2.updateRowData({ remove: selectedRows });
-        }     
+        }
     }
 
     getAllRows() {
@@ -213,46 +213,52 @@ class Listy_Brakow extends Component {
         var date = new Date(this.state.lista.DataGen);
         return (
             <Container>
-            <Row>
-            <Col>
-            <h4>Lista Braków</h4>    
-            <div style={{ height: '500px' }} className="ag-theme-balham">
-            { date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
-                <AgGridReact
-                    columnDefs={this.state.columnDefs}
-                    rowData={this.state.rowData}
-                    context={this.state.context}
-                    onGridReady={this.onGridReady}
-                    rowSelection={this.state.rowSelection}
-                    onSelectionChanged={this.onSelectionChanged.bind(this)}
-                />
-                </div>
-            </Col>
-            <Col>
-            <h4>Generowane Zamowienie</h4>
-            <div style={{ height: '500px' }} className="ag-theme-balham">
-                <AgGridReact
-                    columnDefs={this.state.columnDefs2}
-                    rowData={this.state.rowData2}
-                    context={this.state.context}
-                    onGridReady={this.onGridReady2}
-                    rowSelection={this.state.rowSelection}
-                    onSelectionChanged={this.onSelectionChanged2.bind(this)}
-                />
-            </div>
-            </Col>
-            </Row>
-            <Row>
-            <Col>
-            <FormGroup>
-            <Button className="btn btn-primary" type="button" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
-            </FormGroup>
-            </Col>
+                <Row>
+                    <Col>
+                        <h4>Generowane Zamowienie</h4>
+                    </Col>
+                    <Col>
+                        <h4>Lista Braków</h4>
+                    </Col>
                 </Row>
-                {this.state.redirect && 
+                <Row>
+                    <Col>
+                        <div style={{ height: '500px' }} className="ag-theme-balham">
+                            <AgGridReact
+                                columnDefs={this.state.columnDefs2}
+                                rowData={this.state.rowData2}
+                                context={this.state.context}
+                                onGridReady={this.onGridReady2}
+                                rowSelection={this.state.rowSelection}
+                                onSelectionChanged={this.onSelectionChanged2.bind(this)}
+                            />
+                        </div>
+                    </Col>
+                    <Col>
+                        <div style={{ height: '500px' }} className="ag-theme-balham">
+                            {date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
+                            <AgGridReact
+                                columnDefs={this.state.columnDefs}
+                                rowData={this.state.rowData}
+                                context={this.state.context}
+                                onGridReady={this.onGridReady}
+                                rowSelection={this.state.rowSelection}
+                                onSelectionChanged={this.onSelectionChanged.bind(this)}
+                            />
+                        </div>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <FormGroup>
+                            <Button className="btn btn-primary" type="button" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
+                        </FormGroup>
+                    </Col>
+                </Row>
+                {this.state.redirect &&
                     <Redirect to={{
                         pathname: '/create_zamowienie',
-                    state: { init_data: this.getAllRows() }
+                        state: { init_data: this.getAllRows() }
                     }}
                     />
                 }

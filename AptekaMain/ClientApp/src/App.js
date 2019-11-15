@@ -16,6 +16,9 @@ import Create_Zamowienie from './components/Zamowienia/Create_Zamowienie';
 import Zamowienia from './components/Zamowienia/Zamowienia';
 import Show_Zamowienie from './components/Zamowienia/Show_Zamowienie';
 import Show_Partia from './components/Partia/Show_Partia';
+import Accept_Partia from './components/Partia/Accept_Partia';
+
+import './theme/bootstrap_red.css';
 
 export default () => (
   <Layout>
@@ -34,6 +37,7 @@ export default () => (
         <Route exact path='/show_zamowienie/:id' component={Show_Zamowienie} />
         <Route exact path='/zamowienia/' component={Zamowienia} />
         <Route exact path='/show_partia/:id' component={Show_Partia} />
+        <Route exact path='/accept_partia' component={Accept_Partia} />
         
   </Layout>
 );
