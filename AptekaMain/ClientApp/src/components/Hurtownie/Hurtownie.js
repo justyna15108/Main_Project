@@ -6,20 +6,18 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 
-class Users extends Component {
+class Hurtownie extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            users: [], wydzialy: [], loading_data: true, loading_table: true,
+            hurtownie: [], loading_data: true, loading_table: true,
             columnDefs: [],
             rowData: [],
             context: { componentParent: this },
             rowSelection: "single"
         };
 
-        this.findWydzial = this.findWydzial.bind(this);
-        this.getPoziomDostepu = this.getPoziomDostepu.bind(this);
         this.refresh = this.refresh.bind(this);
         this.setRowData = this.setRowData.bind(this);
         this.setColumns = this.setColumns.bind(this);
@@ -27,33 +25,23 @@ class Users extends Component {
         this.handleCreate = this.handleCreate.bind(this);
     }
 
+    //Componened was created but not yet rendered
+    //good place for fetching data from api or from props
     async componentDidMount() {
-        await fetch('api/Pracowniks')
+        await fetch('api/Hurtownias')
             .then(response => response.json())
             .then(data => {
-                this.setState({ users: data });
-            });
-        await fetch('api/Wydzials')
-            .then(response => response.json())
-            .then(data => {
-                this.setState({ wydzialy: data, loading_data: false })
+                this.setState({ wydzialy: data })
             });
         this.getTableData();
     }
 
+    //If for some reason you want to rerender this component with fetching new data
     refresh() {
         this.props.history.push("/users");
     }
 
-    findWydzial(id) {
-        var wydz = this.state.wydzialy;
-        for (var i in wydz) {
-            if (id === wydz[i].idWydzial)
-                return wydz[i].adres;
-        };
-        return "Wydzial not Found";
-    }
-
+    //when ag grid is ready
     onGridReady = params => {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
@@ -61,61 +49,44 @@ class Users extends Component {
     };
 
     setRowData() {
-        var users = this.state.users;
-        var user_rowData = [];
+        var hurtownie = this.state.hurtownie;
+        var hurtownie_rowData = [];
         for (var i = 0; i < users.length; i++) {
-            var user = users[i];
+            var hurt = hurtownie[i];
             var row = {
-                id: user.idPracownika,
-                imie: user.imie,
-                nazwisko: user.nazwisko,
-                poziomDostepu: this.getPoziomDostepu(user.poziomDostepu),
-                wydzial: this.findWydzial(user.wydzialAptekiIdWydzialu),
-                email: user.email
+                idHurtownia: hurt.idHurtownia,
+
+
+                //fill the rest
             }
 
-            user_rowData.push(row);
+            hurtownie_rowData.push(row);
         }
-        return user_rowData;
+        return hurtownie_rowData;
     }
-
-    getPoziomDostepu(lvl) {
-        let res;
-        switch (lvl) {
-            case 1:
-                res = "Farmaceuta";
-                break;
-            case 2:
-                res = "Kierownik";
-                break;
-            case 3:
-                res = "Administrator";
-                break;
-            default:
-                res = "Not Found";
-        }
-        return res;
-    }
-
+    /* This is what you get from api
+     {
+        "idHurtownia": 1,
+        "nazwa": "alba",
+        "dniNaOplate": 3,
+        "dniNaDostawe": 3
+        },
+    */
+    //default column properties: hide: false, editable: false
+    // header-> column name in the table, field-> real column name, then aditional props
     setColumns() {
         let cols = [
             {
-                headerName: "Numer", field: "id", sortable: true, filter: true
+                headerName: "idHurtownia", field: "idHurtownia", hide: true
             },
             {
-                headerName: "Imie", field: "imie", sortable: true, filter: true
+                headerName: "Nazwa", field: "nazwa", sortable: true, filter: true
             },
             {
-                headerName: "Nazwisko", field: "nazwisko", sortable: true, filter: true,
+                headerName: "Dni dla oplaty zamowienia", field: "dniNaOplate", sortable: true, filter: true,
             },
             {
-                headerName: "Stanowisko", field: "poziomDostepu", sortable: true, filter: true
-            },
-            {
-                headerName: "Wydzial Apteki", field: "wydzial", sortable: true, filter: true
-            },
-            {
-                headerName: "email", field: "email", sortable: true, filter: true
+                headerName: "Dni na dostawe zamowienia", field: "dniNaDostawe", sortable: true, filter: true
             }
         ]
         return cols;
@@ -127,21 +98,17 @@ class Users extends Component {
         this.setState({ columnDefs: cols, rowData: rows, loading_table: false });
     }
 
-    handleRedirect(cell) {
-
-        //alert(cell);
-        this.props.history.push('/user_edit/' + cell);
-    }
-
+    //i use empty edit form to create new but if you want you can create new component
     handleCreate() {
-        this.props.history.push('/user_edit/0');
+        this.props.history.push('/hurtownia_edit/0');
     }
 
+    //when you click on row this function is called 
     onSelectionChanged() {
         let selectedRows = this.gridApi.getSelectedRows();
         let selectedRow = selectedRows.pop();
-        this.props.history.push('/user_edit/' + selectedRow.id);
-
+        this.props.history.push('/Wydzials_edit/' + selectedRow.id);
+        //redirect to edit form
     }
 
     render() {
@@ -164,4 +131,4 @@ class Users extends Component {
 }
 
 
-export default connect()(Users);
+export default connect()(Hurtownie);
