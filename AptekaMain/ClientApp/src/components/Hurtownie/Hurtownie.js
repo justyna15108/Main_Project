@@ -51,7 +51,7 @@ class Hurtownie extends Component {
     setRowData() {
         var hurtownie = this.state.hurtownie;
         var hurtownie_rowData = [];
-        for (var i = 0; i < users.length; i++) {
+        for (var i = 0; i < hurtownie.length; i++) {
             var hurt = hurtownie[i];
             var row = {
                 idHurtownia: hurt.idHurtownia,

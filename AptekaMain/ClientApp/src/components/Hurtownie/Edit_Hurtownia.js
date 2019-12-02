@@ -14,7 +14,7 @@ class Edit_Hurtownia extends Component {
             //fill the rest
         };
         const hurt_id = this.props.match.params.id;
-        if (user_id != 0) {
+        if (hurt_id != 0) {
             fetch('api/Hurtownias/' + hurt_id)
                 .then(response => response.json())
                 .then(data => {

@@ -2,10 +2,13 @@
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
 import { Button, Form, FormGroup, Label, Input, FormText, Table, Container, Row, Col } from 'reactstrap';
-
+import DeleteButton from './DeleteButton'
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
+import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
+import 'ag-grid-community/dist/styles/ag-theme-dark.css';
+import 'ag-grid-community/dist/styles/ag-theme-blue.css';
 
 class Batches extends Component {
 
@@ -27,6 +30,10 @@ class Batches extends Component {
             columnApi2: [],
             idWydzialu: '',
             redirect: false,
+            frameworkComponents: {
+                deleteRenderer: DeleteButton
+            },
+            suma: 0
         };
 
         this.refresh = this.refresh.bind(this);
@@ -34,10 +41,13 @@ class Batches extends Component {
         this.setColumns = this.setColumns.bind(this);
         this.getTableData = this.getTableData.bind(this);
         this.findArtykulName = this.findArtykulName.bind(this);
-        this.findArtykulCount = this.findArtykulCount.bind(this);
         this.handleReturn = this.handleReturn.bind(this);
         this.handleRedirect = this.handleRedirect.bind(this);
         this.getAllRows = this.getAllRows.bind(this);
+        this.findProducentKraj = this.findProducentKraj.bind(this);
+        this.findProducentName = this.findProducentName.bind(this);
+        this.findKategoria = this.findKategoria.bind(this);
+        this.handlesumUpdate = this.handlesumUpdate.bind(this);
     }
 
     async componentDidMount() {
@@ -48,7 +58,7 @@ class Batches extends Component {
             .then(data => {
                 this.setState({ batches: data });
             });
-        await fetch('api/Artykuls?$select=idArtykul, nazwa, illoscPodstawowa')
+        await fetch('api/Artykuls?$expand=kategoriaIdKategoriaNavigation, producentIdProducentNavigation')
             .then(response => response.json())
             .then(data => {
                 this.setState({ artykuls: data });
@@ -65,11 +75,29 @@ class Batches extends Component {
         return "Artykul not Found";
     }
 
-    findArtykulCount(id) {
+    findProducentName(id) {
         var arts = this.state.artykuls;
         for (var i in arts) {
             if (id === arts[i].IdArtykul)
-                return arts[i].IlloscPodstawowa;
+                return arts[i].ProducentIdProducentNavigation.Nazwa;
+        };
+        return 0;
+    }
+
+    findProducentKraj(id) {
+        var arts = this.state.artykuls;
+        for (var i in arts) {
+            if (id === arts[i].IdArtykul)
+                return arts[i].ProducentIdProducentNavigation.Kraj;
+        };
+        return 0;
+    }
+
+    findKategoria(id) {
+        var arts = this.state.artykuls;
+        for (var i in arts) {
+            if (id === arts[i].IdArtykul)
+                return arts[i].KategoriaIdKategoriaNavigation.Nazwa;
         };
         return 0;
     }
@@ -105,8 +133,12 @@ class Batches extends Component {
                 WydzialAptekiIdWydzialu: this.state.idWydzialu,
                 artykul: this.findArtykulName(batch.IdPartiaNavigation.ArtykulIdArtukulu),
                 Kod: batch.Kod,
+                Cena: batch.IdPartiaNavigation.CenaWSprzedazy,
                 Liczba: batch.Liczba,
-                LiczbaWybrana: 1
+                LiczbaWybrana: 1,
+                Producent: this.findProducentName(batch.IdPartiaNavigation.ArtykulIdArtukulu),
+                Kraj: this.findProducentKraj(batch.IdPartiaNavigation.ArtykulIdArtukulu),
+                Kategoria: this.findKategoria(batch.IdPartiaNavigation.ArtykulIdArtukulu)
             }
             brak_rowData.push(row);
         }
@@ -116,7 +148,7 @@ class Batches extends Component {
     setColumns() {
         let cols = [
             {
-                headerName: "IdBatch", field: "IdBraki", hide: true
+                headerName: "IdBatch", field: "IdBraki", hide: true,
             },
             {
                 headerName: "IdPartia", field: "IdPartia", hide: true
@@ -125,16 +157,31 @@ class Batches extends Component {
                 headerName: "WydzialAptekiIdWydzialu", field: "WydzialAptekiIdWydzialu", hide: true
             },
             {
-                headerName: "Artykul", field: "artykul", sortable: true, filter: true, editable: false
+                headerName: "FullArtykul", field: "fullartykul", sortable: true, filter: true, editable: false, width: 400,hide: true
             },
             {
-                headerName: "Kod", field: "Kod", sortable: true, filter: true, editable: false
+                headerName: "Artykul", field: "artykul", sortable: true, filter: true, editable: false, width: 200
             },
             {
-                headerName: "Liczba", field: "Liczba", sortable: true, filter: true, editable: false
+                headerName: "Cena", field: "Cena", sortable: true, filter: true, editable: false, width: 100
             },
             {
-                headerName: "LiczbaWybrana", field: "LiczbaWybrana", hide: true
+                headerName: "Kod", field: "Kod", sortable: true, filter: true, editable: false,width: 100
+            },
+            {
+                headerName: "Liczba", field: "Liczba", sortable: true, filter: true, editable: false, width: 100
+            },
+            {
+                headerName: "Producent", field: "Producent", sortable: true, filter: true, editable: false, width: 150
+            },
+            {
+                headerName: "Kraj Producenta", field: "Kraj", sortable: true, filter: true, editable: false, width: 150
+            },
+            {
+                headerName: "Kategoria", field: "Kategoria", sortable: true, filter: true, editable: false, width: 100
+            },
+            {
+                headerName: "LiczbaWybrana", field: "LiczbaWybrana", hide: true,
             }
         ]
         return cols;
@@ -143,7 +190,7 @@ class Batches extends Component {
     setColumns2() {
         let cols = [
             {
-                headerName: "IdBatch", field: "IdBraki", hide: true
+                headerName: "IdBatch", field: "IdBraki", hide: true,
             },
             {
                 headerName: "IdPartia", field: "IdPartia", hide: true
@@ -152,17 +199,52 @@ class Batches extends Component {
                 headerName: "WydzialAptekiIdWydzialu", field: "WydzialAptekiIdWydzialu", hide: true
             },
             {
-                headerName: "Artykul", field: "artykul", sortable: true, filter: true, editable: false
+                headerName: "FullArtykul", field: "fullartykul", valueGetter: function (params) {
+                    return params.data.artykul + " " + params.data.Producent + " " + params.data.Kraj;
+                },sortable: true, filter: true, editable: false, width: 200
             },
             {
-                headerName: "Kod", field: "Kod", sortable: true, filter: true, editable: false
+                headerName: "Artykul", field: "artykul", sortable: true, filter: true, editable: false, width: 150, hide: true
             },
             {
-                headerName: "LiczbaWSprzedazy", field: "LiczbaWSprzedazy", sortable: true, filter: true, editable: false
+                headerName: "Cena", field: "Cena", sortable: true, filter: true, editable: false, width: 100
             },
             {
-                headerName: "LiczbaWybrana", field: "LiczbaWybrana", editable: true
-            }
+                headerName: "Kod", field: "Kod", sortable: true, filter: true, editable: false, width: 100
+            },
+            {
+                headerName: "Liczba", field: "Liczba", sortable: true, filter: true, editable: false, width: 100, hide: true
+            },
+            {
+                headerName: "Producent", field: "Producent", sortable: true, filter: true, editable: false, width: 150, hide: true
+            },
+            {
+                headerName: "Kraj Producenta", field: "Kraj", sortable: true, filter: true, editable: false, width: 150, hide: true
+            },
+            {
+                headerName: "Kategoria", field: "Kategoria", sortable: true, filter: true, editable: false, width: 100, hide: true
+            },
+            {
+                headerName: "LiczbaWybrana", field: "LiczbaWybrana", editable: true, type: "valueColumn", valueSetter: function (params) {
+                    let tmp = Number(params.newValue);
+                    console.log(tmp);
+                    if (tmp < 1)
+                        tmp = 1;
+                    else if (tmp > params.data.Liczba)
+                        tmp = params.data.Liczba;
+                    return params.data.LiczbaWybrana=tmp;
+                }, width: 150
+            },
+            {
+                headerName: "Wartosc", field: "Wartosc", valueGetter: function (params) {
+                    return params.data.LiczbaWybrana * params.data.Cena;
+                }, sortable: true, filter: true, editable: false, width: 150
+            },
+            {
+                headerName: "deleteRenderer", field: "tmp", cellRenderer: "deleteRenderer", colId: "delete"
+            },
+
+
         ]
         return cols;
     }
@@ -183,19 +265,23 @@ class Batches extends Component {
             this.gridApi2.updateRowData({ add: selectedRows })
             this.gridApi1.updateRowData({ remove: selectedRows });
         }
-        console.log(this.gridApi2);
+        this.handlesumUpdate();
+        //console.log(this.gridApi2);
     }
 
     onSelectionChanged2() {
         var selectedRows = this.gridApi2.getSelectedRows();
+        let selectedCell = this.gridApi2.getFocusedCell();
         var selectedRow = selectedRows[0];
+        if (selectedCell.column.colId == 'delete')
         if (selectedRow) {
             this.gridApi1.updateRowData({ add: selectedRows })
             //let rows = this.state.rowData2;
             //rows.push(selectedRow);
             //this.setState({ rowData2: rows });
             this.gridApi2.updateRowData({ remove: selectedRows });
-        }
+            }
+        this.handlesumUpdate();
     }
 
     getAllRows() {
@@ -208,22 +294,42 @@ class Batches extends Component {
         this.setState({ redirect: true });
     }
 
+    onCellEditingStopped(e) {
+        //console.log(e);
+        //console.log(this.gridApi2);
+        this.handlesumUpdate();
+    }
+
+
+    handlesumUpdate() {
+        let sum = 0;
+        this.gridApi2.forEachNode(node => {
+            sum += node.data.LiczbaWybrana*node.data.Cena;
+            console.log("Wartosc");
+            console.log(node.data.LiczbaWybrana);
+            console.log(node.data.Cena);
+        });
+        console.log(sum);
+        this.setState({ suma: sum });
+    }
+
     render() {
         var date = new Date(this.state.lista.DataGen);
+        //var comp = numericCellEditor: NumericCellEditor};
         return (
-            <Container>
+            <Container fluid>
                 <Row>
                     <Col>
                         <h4>Wydzial </h4>
+                        {date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
                     </Col>
                     <Col>
                         <h4>Sprzedaz</h4>
                     </Col>
                 </Row>
                 <Row>
-                    <Col>
+                    <Col xs="6">
                         <div style={{ height: '500px' }} className="ag-theme-balham">
-                            {date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
                             <AgGridReact
                                 columnDefs={this.state.columnDefs}
                                 rowData={this.state.rowData}
@@ -235,15 +341,17 @@ class Batches extends Component {
                         </div>
                     </Col>
                     <Col>
-                        <div style={{ height: '500px' }} className="ag-theme-balham">
+                        <div style={{ height: '500px' }} className="ag-theme-blue">
                             <AgGridReact
                                 columnDefs={this.state.columnDefs2}
                                 rowData={this.state.rowData2}
                                 context={this.state.context}
                                 onGridReady={this.onGridReady2}
+                                frameworkComponents={this.state.frameworkComponents}
                                 rowSelection={this.state.rowSelection}
                                 onSelectionChanged={this.onSelectionChanged2.bind(this)}
-                            />
+                                onCellEditingStopped={this.onCellEditingStopped.bind(this)}
+                         />
                         </div>
                     </Col>
                 </Row>
@@ -252,6 +360,11 @@ class Batches extends Component {
                         <FormGroup>
                             <Button className="btn btn-primary" type="button" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
                         </FormGroup>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <p>Lączna wartość: {this.state.suma}</p>
                     </Col>
                 </Row>
                 {this.state.redirect &&
