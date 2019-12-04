@@ -4,6 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import { Button, Form, FormGroup, Label, Input, FormText, Table, Container, Row, Col } from 'reactstrap';
 import DeleteButton from './DeleteButton'
 import { AgGridReact } from 'ag-grid-react';
+import Podsumowanie from './Podsumowanie';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
@@ -33,7 +34,9 @@ class Batches extends Component {
             frameworkComponents: {
                 deleteRenderer: DeleteButton
             },
-            suma: 0
+            suma: 0,
+            open: false,
+            list:[]
         };
 
         this.refresh = this.refresh.bind(this);
@@ -48,6 +51,10 @@ class Batches extends Component {
         this.findProducentName = this.findProducentName.bind(this);
         this.findKategoria = this.findKategoria.bind(this);
         this.handlesumUpdate = this.handlesumUpdate.bind(this);
+        this.togglePopUp = this.togglePopUp.bind(this);
+        this.hide = this.hide.bind(this);
+        this.create_list = this.create_list.bind(this);
+        this.handleAccept = this.handleAccept.bind(this);
     }
 
     async componentDidMount() {
@@ -148,7 +155,7 @@ class Batches extends Component {
     setColumns() {
         let cols = [
             {
-                headerName: "IdBatch", field: "IdBraki", hide: true,
+                headerName: "IdBatch", field: "IdBatch", hide: true,
             },
             {
                 headerName: "IdPartia", field: "IdPartia", hide: true
@@ -190,7 +197,7 @@ class Batches extends Component {
     setColumns2() {
         let cols = [
             {
-                headerName: "IdBatch", field: "IdBraki", hide: true,
+                headerName: "IdBatch", field: "IdBatch", hide: true,
             },
             {
                 headerName: "IdPartia", field: "IdPartia", hide: true
@@ -200,7 +207,7 @@ class Batches extends Component {
             },
             {
                 headerName: "FullArtykul", field: "fullartykul", valueGetter: function (params) {
-                    return params.data.artykul + " " + params.data.Producent + " " + params.data.Kraj;
+                    return params.data.FullArtykul=params.data.artykul + " " + params.data.Producent + " " + params.data.Kraj;
                 },sortable: true, filter: true, editable: false, width: 200
             },
             {
@@ -227,18 +234,20 @@ class Batches extends Component {
             {
                 headerName: "LiczbaWybrana", field: "LiczbaWybrana", editable: true, type: "valueColumn", valueSetter: function (params) {
                     let tmp = Number(params.newValue);
-                    console.log(tmp);
                     if (tmp < 1)
                         tmp = 1;
                     else if (tmp > params.data.Liczba)
                         tmp = params.data.Liczba;
                     return params.data.LiczbaWybrana=tmp;
-                }, width: 150
+                },width: 150
             },
             {
                 headerName: "Wartosc", field: "Wartosc", valueGetter: function (params) {
-                    return params.data.LiczbaWybrana * params.data.Cena;
-                }, sortable: true, filter: true, editable: false, width: 150
+                    return params.data.Wartosc=params.data.LiczbaWybrana * params.data.Cena;
+                }, valueSetter(params) {
+                    return params.data.Wartosc;
+                },
+                sortable: true, filter: true, editable: false, width: 150
             },
             {
                 headerName: "deleteRenderer", field: "tmp", cellRenderer: "deleteRenderer", colId: "delete"
@@ -305,12 +314,64 @@ class Batches extends Component {
         let sum = 0;
         this.gridApi2.forEachNode(node => {
             sum += node.data.LiczbaWybrana*node.data.Cena;
-            console.log("Wartosc");
-            console.log(node.data.LiczbaWybrana);
-            console.log(node.data.Cena);
         });
-        console.log(sum);
         this.setState({ suma: sum });
+    }
+
+    togglePopUp() {
+        this.create_list();
+        this.setState({ open: true });
+    }
+
+    hide() {
+        this.setState({ open: false });
+    }
+
+
+    create_list() {
+        let l = [];
+
+        this.gridApi2.forEachNode(node => {
+            let row = {
+                idBatch: node.data.IdBatch,
+                kod: node.data.Kod,
+                liczba: node.data.Liczba,
+                wydzialAptekiIdWydzialu: node.data.WydzialAptekiIdWydzialu,
+                idPartia: node.data.IdPartia,
+                cena: node.data.Cena,
+                liczbaWybrana: node.data.LiczbaWybrana,
+                Wartosc: node.data.Wartosc,
+                artykul: node.data.artykul,
+                full_artykul: node.data.FullArtykul
+            };
+            l.push(row);
+        });
+        this.setState({ list: l });
+    }
+
+    handleAccept() {
+        console.log("Accept");
+        for (item in this.state.list) {
+            console.log(item);
+            /*
+            fetch("api/Batches/" + this.state.partia.IdPartia, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                idPartia: this.state.partia.IdPartia,
+                DataWaznosci: this.state.due_date,
+                ZamowienieIdZamowienia: this.state.partia.ZamowienieIdZamowienia,
+                artykulIdArtukulu: this.state.partia.ArtykulIdArtukulu,
+                Status: "przyjęta",
+                CenaWSprzedazy: this.state.CenaWSprzedazy,
+                CenaWZakupu: this.state.CenaWZakupu,
+                Liczba: this.state.Liczba,
+                LiczbaWSprzedazy: this.state.LiczbaWSprzedazy,
+            })
+            */
+        }
     }
 
     render() {
@@ -374,6 +435,8 @@ class Batches extends Component {
                     }}
                     />
                 }
+                <Podsumowanie isopen={this.state.open} hide={this.hide} list={this.state.list} suma={this.state.suma} accept={this.handleAccept} />
+                <Button onClick={this.togglePopUp}>Podsumowanie</Button>
             </Container>
         );
     }
