@@ -1,7 +1,7 @@
 ﻿import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link, Redirect } from 'react-router-dom';
-import { Button, Form, FormGroup, Label, Input, FormText, Table, Container, Row, Col } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormText, Table, Container, Row, Col, select } from 'reactstrap';
 import DeleteButton from './DeleteButton'
 import { AgGridReact } from 'ag-grid-react';
 import Podsumowanie from './Podsumowanie';
@@ -16,7 +16,7 @@ class Batches extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            lista: '', artykuls: [], batches: [], loading_data: true, loading_table: true,
+            lista: '', artykuls: [], batches: [], rabats: [], rabat: 1, loading_data: true, loading_table: true,
             columnDefs: [],
             rowData: [],
             columnDefs2: [],
@@ -36,7 +36,9 @@ class Batches extends Component {
             },
             suma: 0,
             open: false,
-            list:[]
+            list: [],
+            typOplaty: "Gotówka",
+            sprzedaz_id: ''
         };
 
         this.refresh = this.refresh.bind(this);
@@ -55,6 +57,10 @@ class Batches extends Component {
         this.hide = this.hide.bind(this);
         this.create_list = this.create_list.bind(this);
         this.handleAccept = this.handleAccept.bind(this);
+        this.check_recepta = this.check_recepta.bind(this);
+        this.get_recepta_need = this.get_recepta_need.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.findRabat = this.findRabat.bind(this);
     }
 
     async componentDidMount() {
@@ -69,6 +75,11 @@ class Batches extends Component {
             .then(response => response.json())
             .then(data => {
                 this.setState({ artykuls: data });
+            });
+        await fetch('api/Rabats')
+            .then(response => response.json())
+            .then(data => {
+                this.setState({ rabats: data });
             });
         this.getTableData();
     }
@@ -109,6 +120,15 @@ class Batches extends Component {
         return 0;
     }
 
+    findRabat(id) {
+        var rabats = this.state.rabats;
+        for (var i in rabats) {
+            if (id == rabats[i].idRabat)
+                return rabats[i].procentRabatu;
+        };
+        return 0;
+    }
+
     refresh() {
         this.props.history.push("/listy_brakow");
     }
@@ -137,6 +157,7 @@ class Batches extends Component {
             var row = {
                 IdBatch: batch.IdBatch,
                 IdPartia: batch.IdPartia,
+                idArtykul: batch.IdPartiaNavigation.ArtykulIdArtukulu,
                 WydzialAptekiIdWydzialu: this.state.idWydzialu,
                 artykul: this.findArtykulName(batch.IdPartiaNavigation.ArtykulIdArtukulu),
                 Kod: batch.Kod,
@@ -161,10 +182,13 @@ class Batches extends Component {
                 headerName: "IdPartia", field: "IdPartia", hide: true
             },
             {
+                headerName: "idArtykul", field: "idArtykul", hide: true
+            },
+            {
                 headerName: "WydzialAptekiIdWydzialu", field: "WydzialAptekiIdWydzialu", hide: true
             },
             {
-                headerName: "FullArtykul", field: "fullartykul", sortable: true, filter: true, editable: false, width: 400,hide: true
+                headerName: "FullArtykul", field: "fullartykul", sortable: true, filter: true, editable: false, width: 400, hide: true
             },
             {
                 headerName: "Artykul", field: "artykul", sortable: true, filter: true, editable: false, width: 200
@@ -173,7 +197,7 @@ class Batches extends Component {
                 headerName: "Cena", field: "Cena", sortable: true, filter: true, editable: false, width: 100
             },
             {
-                headerName: "Kod", field: "Kod", sortable: true, filter: true, editable: false,width: 100
+                headerName: "Kod", field: "Kod", sortable: true, filter: true, editable: false, width: 100
             },
             {
                 headerName: "Liczba", field: "Liczba", sortable: true, filter: true, editable: false, width: 100
@@ -203,12 +227,15 @@ class Batches extends Component {
                 headerName: "IdPartia", field: "IdPartia", hide: true
             },
             {
+                headerName: "idArtykul", field: "idArtykul", hide: true
+            },
+            {
                 headerName: "WydzialAptekiIdWydzialu", field: "WydzialAptekiIdWydzialu", hide: true
             },
             {
                 headerName: "FullArtykul", field: "fullartykul", valueGetter: function (params) {
-                    return params.data.FullArtykul=params.data.artykul + " " + params.data.Producent + " " + params.data.Kraj;
-                },sortable: true, filter: true, editable: false, width: 200
+                    return params.data.FullArtykul = params.data.artykul + " " + params.data.Producent + " " + params.data.Kraj;
+                }, sortable: true, filter: true, editable: false, width: 200
             },
             {
                 headerName: "Artykul", field: "artykul", sortable: true, filter: true, editable: false, width: 150, hide: true
@@ -238,12 +265,12 @@ class Batches extends Component {
                         tmp = 1;
                     else if (tmp > params.data.Liczba)
                         tmp = params.data.Liczba;
-                    return params.data.LiczbaWybrana=tmp;
-                },width: 150
+                    return params.data.LiczbaWybrana = tmp;
+                }, width: 150
             },
             {
                 headerName: "Wartosc", field: "Wartosc", valueGetter: function (params) {
-                    return params.data.Wartosc=params.data.LiczbaWybrana * params.data.Cena;
+                    return params.data.Wartosc = params.data.LiczbaWybrana * params.data.Cena;
                 }, valueSetter(params) {
                     return params.data.Wartosc;
                 },
@@ -267,6 +294,23 @@ class Batches extends Component {
         //new Date(parsed);
     }
 
+
+    handleInputChange(event) {
+        const target = event.target;
+        let name = target.name;
+        let value = target.value;
+        switch (name) {
+            case 'rabat':
+                this.setState({ rabat: value });
+                setTimeout(this.handlesumUpdate, 100);
+                break;
+            default:
+                console.log("Unknown");
+                break;
+        }
+
+    }
+
     onSelectionChanged() {
         var selectedRows = this.gridApi1.getSelectedRows();
         var selectedRow = selectedRows[0];
@@ -283,12 +327,12 @@ class Batches extends Component {
         let selectedCell = this.gridApi2.getFocusedCell();
         var selectedRow = selectedRows[0];
         if (selectedCell.column.colId == 'delete')
-        if (selectedRow) {
-            this.gridApi1.updateRowData({ add: selectedRows })
-            //let rows = this.state.rowData2;
-            //rows.push(selectedRow);
-            //this.setState({ rowData2: rows });
-            this.gridApi2.updateRowData({ remove: selectedRows });
+            if (selectedRow) {
+                this.gridApi1.updateRowData({ add: selectedRows })
+                //let rows = this.state.rowData2;
+                //rows.push(selectedRow);
+                //this.setState({ rowData2: rows });
+                this.gridApi2.updateRowData({ remove: selectedRows });
             }
         this.handlesumUpdate();
     }
@@ -313,8 +357,10 @@ class Batches extends Component {
     handlesumUpdate() {
         let sum = 0;
         this.gridApi2.forEachNode(node => {
-            sum += node.data.LiczbaWybrana*node.data.Cena;
+            sum += node.data.LiczbaWybrana * node.data.Cena;
         });
+        let procent = 100 - this.findRabat(this.state.rabat);
+        sum = sum * procent / 100;
         this.setState({ suma: sum });
     }
 
@@ -334,6 +380,7 @@ class Batches extends Component {
         this.gridApi2.forEachNode(node => {
             let row = {
                 idBatch: node.data.IdBatch,
+                idArtykul: node.data.idArtykul,
                 kod: node.data.Kod,
                 liczba: node.data.Liczba,
                 wydzialAptekiIdWydzialu: node.data.WydzialAptekiIdWydzialu,
@@ -350,28 +397,61 @@ class Batches extends Component {
     }
 
     handleAccept() {
-        console.log("Accept");
-        for (item in this.state.list) {
-            console.log(item);
-            /*
-            fetch("api/Batches/" + this.state.partia.IdPartia, {
-            method: 'PUT',
+        var sprzedaz_id;
+        var req_sprzedaz = JSON.stringify({
+            dataSprzedazy: new Date(),
+            suma: this.state.suma,
+            typOplaty: this.state.typOplaty,
+            wymaganaRecepta: this.get_recepta_need(),
+            rabatIdRabatu: this.state.rabat
+        });
+        fetch("/api/Sprzedaz", {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                idPartia: this.state.partia.IdPartia,
-                DataWaznosci: this.state.due_date,
-                ZamowienieIdZamowienia: this.state.partia.ZamowienieIdZamowienia,
-                artykulIdArtukulu: this.state.partia.ArtykulIdArtukulu,
-                Status: "przyjęta",
-                CenaWSprzedazy: this.state.CenaWSprzedazy,
-                CenaWZakupu: this.state.CenaWZakupu,
-                Liczba: this.state.Liczba,
-                LiczbaWSprzedazy: this.state.LiczbaWSprzedazy,
-            })
-            */
+            body: req_sprzedaz
+        }).then(response => response.json()).then(data => {
+            console.log(data);
+            sprzedaz_id = data.idSprzedaz;
+            this.setState({ sprzedaz_id: data.idSprzedaz });
+            for (let item of this.state.list) {
+
+                var req_sp = JSON.stringify({
+                    sprzedazId: data.idSprzedaz,
+                    batchId: item.idBatch,
+                    liczba: item.liczbaWybrana,
+                });
+
+                fetch("/api/SprzedazProduktow", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: req_sp
+                }).then(response => response.json()).then(data => console.log(data));
+            } return data;
+        }).then(data => { this.props.history.push('/sprzedaz/' + data.idSprzedaz) });
+
+        this.hide();
+
+    }
+
+    check_recepta(id) {
+        var arts = this.state.artykuls;
+        for (var i in arts) {
+            if (id === arts[i].IdArtykul)
+                return arts[i].WymaganaRecepta;
+        };
+        return false;
+    }
+
+    get_recepta_need() {
+        for (let item of this.state.list) {
+            if (this.check_recepta(item.idArtykul) === true)
+                return true;
         }
+        return false;
     }
 
     render() {
@@ -402,6 +482,11 @@ class Batches extends Component {
                         </div>
                     </Col>
                     <Col>
+                        <select className="form-control" name="rabat" value={this.state.rabat} onChange={this.handleInputChange}>
+                            {this.state.rabats.map(rabat =>
+                                <option key={rabat.idRabat} value={rabat.idRabat} >{rabat.procentRabatu}%</option>
+                            )}
+                        </select>
                         <div style={{ height: '500px' }} className="ag-theme-blue">
                             <AgGridReact
                                 columnDefs={this.state.columnDefs2}
@@ -412,7 +497,7 @@ class Batches extends Component {
                                 rowSelection={this.state.rowSelection}
                                 onSelectionChanged={this.onSelectionChanged2.bind(this)}
                                 onCellEditingStopped={this.onCellEditingStopped.bind(this)}
-                         />
+                            />
                         </div>
                     </Col>
                 </Row>

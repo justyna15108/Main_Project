@@ -357,11 +357,19 @@ namespace AptekaMain.Models
 
                 entity.Property(e => e.RabatIdRabatu).HasColumnName("rabat_id_rabatu");
 
+                entity.Property(e => e.ReceptaDolaczona)
+                    .HasColumnName("recepta_dolaczona")
+                    .HasDefaultValueSql("((0))");
+
                 entity.Property(e => e.Suma).HasColumnName("suma");
 
                 entity.Property(e => e.TypOplaty)
                     .HasColumnName("typ_oplaty")
                     .HasMaxLength(50);
+
+                entity.Property(e => e.WymaganaRecepta)
+                    .HasColumnName("wymagana_recepta")
+                    .HasDefaultValueSql("((0))");
 
                 entity.HasOne(d => d.RabatIdRabatuNavigation)
                     .WithMany(p => p.Sprzedaz)
@@ -371,25 +379,27 @@ namespace AptekaMain.Models
 
             modelBuilder.Entity<SprzedazProduktow>(entity =>
             {
-                entity.HasKey(e => new { e.SprzedazIdSprzedazy, e.BatchWApteceIdProduktu });
+                entity.HasKey(e => e.IdSp);
 
                 entity.ToTable("Sprzedaz_produktow");
 
-                entity.Property(e => e.SprzedazIdSprzedazy)
-                    .HasColumnName("sprzedaz_id_sprzedazy")
-                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.IdSp).HasColumnName("id_sp");
 
-                entity.Property(e => e.BatchWApteceIdProduktu).HasColumnName("batch_w_aptece_id_produktu");
+                entity.Property(e => e.BatchId).HasColumnName("batch_id");
 
-                entity.HasOne(d => d.BatchWApteceIdProduktuNavigation)
+                entity.Property(e => e.Liczba).HasColumnName("liczba");
+
+                entity.Property(e => e.SprzedazId).HasColumnName("sprzedaz_id");
+
+                entity.HasOne(d => d.Batch)
                     .WithMany(p => p.SprzedazProduktow)
-                    .HasForeignKey(d => d.BatchWApteceIdProduktu)
+                    .HasForeignKey(d => d.BatchId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("sprzedaz_produktów_batch_w_aptece_fk");
 
-                entity.HasOne(d => d.SprzedazIdSprzedazyNavigation)
+                entity.HasOne(d => d.Sprzedaz)
                     .WithMany(p => p.SprzedazProduktow)
-                    .HasForeignKey(d => d.SprzedazIdSprzedazy)
+                    .HasForeignKey(d => d.SprzedazId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("sprzedaz_produktów_sprzedaz_fk");
             });

@@ -5,10 +5,12 @@ namespace AptekaMain.Models
 {
     public partial class SprzedazProduktow
     {
-        public int SprzedazIdSprzedazy { get; set; }
-        public int BatchWApteceIdProduktu { get; set; }
+        public int IdSp { get; set; }
+        public int SprzedazId { get; set; }
+        public int BatchId { get; set; }
+        public int? Liczba { get; set; }
 
-        public Batch BatchWApteceIdProduktuNavigation { get; set; }
-        public Sprzedaz SprzedazIdSprzedazyNavigation { get; set; }
+        public Batch Batch { get; set; }
+        public Sprzedaz Sprzedaz { get; set; }
     }
 }

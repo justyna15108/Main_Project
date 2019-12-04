@@ -6,61 +6,64 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AptekaMain.Models;
+using Microsoft.AspNet.OData;
 
 namespace AptekaMain.Controllers
 {
+    [EnableQuery]
+
     [Route("api/[controller]")]
     [ApiController]
-    public class SprzedazProduktowsController : ControllerBase
+    public class SprzedazController : ControllerBase
     {
         private readonly AptekaMainContext _context;
 
-        public SprzedazProduktowsController(AptekaMainContext context)
+        public SprzedazController(AptekaMainContext context)
         {
             _context = context;
         }
 
-        // GET: api/SprzedazProduktows
+        // GET: api/Sprzedazs
         [HttpGet]
-        public IEnumerable<SprzedazProduktow> GetSprzedazProduktow()
+        public IEnumerable<Sprzedaz> GetSprzedaz()
         {
-            return _context.SprzedazProduktow;
+            return _context.Sprzedaz;
         }
 
-        // GET: api/SprzedazProduktows/5
+        // GET: api/Sprzedazs/5
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetSprzedazProduktow([FromRoute] int id)
+        public async Task<IActionResult> GetSprzedaz([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var sprzedazProduktow = await _context.SprzedazProduktow.FindAsync(id);
+            var sprzedaz = await _context.Sprzedaz.FindAsync(id);
 
-            if (sprzedazProduktow == null)
+            if (sprzedaz == null)
             {
                 return NotFound();
             }
 
-            return Ok(sprzedazProduktow);
+            return Ok(sprzedaz);
         }
 
-        // PUT: api/SprzedazProduktows/5
+        // PUT: api/Sprzedazs/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutSprzedazProduktow([FromRoute] int id, [FromBody] SprzedazProduktow sprzedazProduktow)
+        public async Task<IActionResult> PutSprzedaz([FromRoute] int id, [FromBody] Sprzedaz sprzedaz)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != sprzedazProduktow.SprzedazIdSprzedazy)
+            if (id != sprzedaz.IdSprzedaz)
             {
                 return BadRequest();
             }
 
-            _context.Entry(sprzedazProduktow).State = EntityState.Modified;
+            _context.Entry(sprzedaz).State = EntityState.Modified;
 
             try
             {
@@ -68,7 +71,7 @@ namespace AptekaMain.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SprzedazProduktowExists(id))
+                if (!SprzedazExists(id))
                 {
                     return NotFound();
                 }
@@ -81,45 +84,45 @@ namespace AptekaMain.Controllers
             return NoContent();
         }
 
-        // POST: api/SprzedazProduktows
+        // POST: api/Sprzedazs
         [HttpPost]
-        public async Task<IActionResult> PostSprzedazProduktow([FromBody] SprzedazProduktow sprzedazProduktow)
+        public async Task<IActionResult> PostSprzedaz([FromBody] Sprzedaz sprzedaz)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _context.SprzedazProduktow.Add(sprzedazProduktow);
+            _context.Sprzedaz.Add(sprzedaz);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSprzedazProduktow", new { id = sprzedazProduktow.SprzedazIdSprzedazy }, sprzedazProduktow);
+            return CreatedAtAction("GetSprzedaz", new { id = sprzedaz.IdSprzedaz }, sprzedaz);
         }
 
-        // DELETE: api/SprzedazProduktows/5
+        // DELETE: api/Sprzedazs/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSprzedazProduktow([FromRoute] int id)
+        public async Task<IActionResult> DeleteSprzedaz([FromRoute] int id)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var sprzedazProduktow = await _context.SprzedazProduktow.FindAsync(id);
-            if (sprzedazProduktow == null)
+            var sprzedaz = await _context.Sprzedaz.FindAsync(id);
+            if (sprzedaz == null)
             {
                 return NotFound();
             }
 
-            _context.SprzedazProduktow.Remove(sprzedazProduktow);
+            _context.Sprzedaz.Remove(sprzedaz);
             await _context.SaveChangesAsync();
 
-            return Ok(sprzedazProduktow);
+            return Ok(sprzedaz);
         }
 
-        private bool SprzedazProduktowExists(int id)
+        private bool SprzedazExists(int id)
         {
-            return _context.SprzedazProduktow.Any(e => e.SprzedazIdSprzedazy == id);
+            return _context.Sprzedaz.Any(e => e.IdSprzedaz == id);
         }
     }
 }

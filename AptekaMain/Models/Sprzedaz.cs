@@ -16,6 +16,8 @@ namespace AptekaMain.Models
         public long? Suma { get; set; }
         public int? RabatIdRabatu { get; set; }
         public string TypOplaty { get; set; }
+        public bool? WymaganaRecepta { get; set; }
+        public bool? ReceptaDolaczona { get; set; }
 
         public Rabat RabatIdRabatuNavigation { get; set; }
         public ICollection<ScanRecepty> ScanRecepty { get; set; }
