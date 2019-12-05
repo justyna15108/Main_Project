@@ -73,10 +73,10 @@ class NavMenu extends React.Component {
                                     </DropdownToggle>
                                     <DropdownMenu right>
                                         <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/scans">Scany Receptów</NavLink>
+                                            <NavLink tag={Link} className="text-dark" to="/batches/1">Sprzedaz w aptece</NavLink>
                                         </DropdownItem>
                                         <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/add_scans">Dodaj Scan</NavLink>
+                                            <NavLink tag={Link} className="text-dark" to="/sprzedazy">Sprzedazy</NavLink>
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>

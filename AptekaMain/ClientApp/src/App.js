@@ -21,6 +21,8 @@ import Batches from './components/Sprzedaz/Batches';
 import './theme/bootstrap_red.css';
 import Hurtownie from './components/Hurtownie/Hurtownie';
 import Edit_Hurtownia from './components/Hurtownie/Edit_Hurtownia';
+import Edit_Sprzedaz from './components/Sprzedaz/Edit_Sprzedaz';
+import Sprzedazy from './components/Sprzedaz/Sprzedazy';
 
 
 export default () => (
@@ -44,6 +46,7 @@ export default () => (
         <Route exact path='/batches/:id' component={Batches} />
         <Route exact path='/hurtownie' component={Hurtownie} />
         <Route exact path='/hurtownia_edit/:id' component={Edit_Hurtownia} />
-        
+        <Route exact path='/sprzedaz/:id' component={Edit_Sprzedaz} />
+        <Route exact path='/sprzedazy/' component={Sprzedazy} />
   </Layout>
 );

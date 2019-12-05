@@ -10,7 +10,7 @@ using Microsoft.AspNet.OData;
 
 namespace AptekaMain.Controllers
 {
-    [EnableQuery]
+    [EnableQuery(MaxExpansionDepth = 4)]
 
     [Route("api/[controller]")]
     [ApiController]

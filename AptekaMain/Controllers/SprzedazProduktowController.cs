@@ -6,9 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AptekaMain.Models;
+using Microsoft.AspNet.OData;
 
 namespace AptekaMain.Controllers
 {
+    [EnableQuery]
+
     [Route("api/[controller]")]
     [ApiController]
     public class SprzedazProduktowController : ControllerBase
