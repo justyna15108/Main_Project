@@ -84,6 +84,7 @@ class Edit_Sprzedaz extends Component {
     }
 
     refresh() {
+        this.props.history.push("/");
         this.props.history.push("/sprzedaz/" + this.state.IdSprzedaz);
     }
 
@@ -169,6 +170,7 @@ class Edit_Sprzedaz extends Component {
                 arrayvar: [...prevState.scans, resp.data]
             }))
             console.log(resp.data);
+            this.handleReturn();
         });
         
     }

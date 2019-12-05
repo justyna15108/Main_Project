@@ -66,7 +66,7 @@ class Batches extends Component {
     async componentDidMount() {
         const wydzial_id = this.props.match.params.id;
         this.setState({ idWydzialu: 1 });
-        await fetch('api/Batches?$expand=idPartiaNavigation&$filter=wydzialAptekiIdWydzialu eq 1')
+        await fetch('api/Batches?$expand=idPartiaNavigation&$filter=wydzialAptekiIdWydzialu eq 1 and liczba ne 0')
             .then(response => response.json())
             .then(data => {
                 this.setState({ batches: data });
