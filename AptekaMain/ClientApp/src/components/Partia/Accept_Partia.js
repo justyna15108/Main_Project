@@ -110,7 +110,7 @@ class Accept_Partia extends Component {
         for (var i = 0; i < wydz.length; i++) {
             var wyd = wydz[i];
             var row = {
-                Kod: "",
+                Kod: ""+this.state.idPartia+"-"+i,
                 Liczba: this.state.Liczba / wydz.length,
                 idWydzial: wyd.idWydzial,
             }
@@ -180,6 +180,10 @@ class Accept_Partia extends Component {
             },
             {
                 headerName: "Illosc w batchu", field: "Liczba", sortable: true, filter: true, editable: false,
+                valueSetter: function (params) {
+                    let tmp = parseInt(params.newValue, 10);
+                    return params.data.Liczba = tmp;
+                },
             }
         ]
         return cols;
@@ -272,7 +276,7 @@ class Accept_Partia extends Component {
                 <Row>
                     <Col>
                         <FormGroup>
-                            <Button className="btn btn-primary" type="button" onClick={this.handleUpdate}>{this.state.length === this.state.current_location ? "Zakoncz Przyjmowanie" : "Przejdz do następnego"} </Button>
+                            <Button color="success" onClick={this.handleUpdate}>{this.state.length === this.state.current_location ? "Zakoncz Przyjmowanie" : "Przejdz do następnego"} </Button>
                         </FormGroup>
                     </Col>
                     <Col>

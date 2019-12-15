@@ -18,7 +18,6 @@ import Show_Zamowienie from './components/Zamowienia/Show_Zamowienie';
 import Show_Partia from './components/Partia/Show_Partia';
 import Accept_Partia from './components/Partia/Accept_Partia';
 import Batches from './components/Sprzedaz/Batches';
-import './theme/bootstrap_red.css';
 import Hurtownie from './components/Hurtownie/Hurtownie';
 import Edit_Hurtownia from './components/Hurtownie/Edit_Hurtownia';
 import Edit_Sprzedaz from './components/Sprzedaz/Edit_Sprzedaz';

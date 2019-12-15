@@ -35,7 +35,7 @@ class NavMenu extends React.Component {
     render() {
         return (
             <header>
-                <Navbar className="navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3 bg-primary " dark>
+                <Navbar className="navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow navbar-dark bg-dark" dark>
                     <Container fluid>
                         <NavbarBrand tag={Link} to="/">Apteka</NavbarBrand>
                         <NavbarToggler onClick={this.toggle} className="mr-2" />

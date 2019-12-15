@@ -1,11 +1,9 @@
 ﻿import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { Button, Form, FormGroup, Label, Input, FormText, Table, Container, Row, Col } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormText, Table, Alert, Container, Row, Col } from 'reactstrap';
 import { AgGridReact } from 'ag-grid-react';
 import Select from 'react-select';
 import DatePicker from 'react-datepicker';
-import axios from 'axios';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -37,6 +35,7 @@ class Create_Zamowienia extends Component {
 
         this.findHurtowniaName = this.findHurtowniaName.bind(this);
         this.findArtykul = this.findArtykul.bind(this);
+        this.findArtykulPrice = this.findArtykulPrice.bind(this);
         this.refresh = this.refresh.bind(this);
         this.setRowData = this.setRowData.bind(this);
         this.setColumns = this.setColumns.bind(this);
@@ -55,7 +54,7 @@ class Create_Zamowienia extends Component {
         if (this.props.location.state) {
             this.setState({ init_data: this.props.location.state.init_data });
         }
-        await fetch('api/Artykuls')
+        await fetch('api/Artykuls?$expand=partia($orderby=IdPartia desc;$top=1)')
             .then(response => response.json())
             .then(data => {
                 this.setState({ artykuls: data });
@@ -71,7 +70,7 @@ class Create_Zamowienia extends Component {
             art => {
                 return {
                     value: art,
-                    label: art.nazwa,
+                    label: art.Nazwa,
                 }
             }
         );
@@ -94,9 +93,21 @@ class Create_Zamowienia extends Component {
     findArtykul(id) {
         var art = this.state.artykuls;
         for (var i in art) {
-            if (id === art[i].idArtykul)
+            if (id === art[i].IdArtykul)
                 return art[i];
         }
+    }
+
+    findArtykulPrice(id) {
+        var art = this.state.artykuls;
+        for (var i in art) {
+            if (id === art[i].IdArtykul)
+                if (art[i].Partia.length > 0)
+                    return art[i].Partia[0].CenaWZakupu;
+                else
+                    return 1;
+        }
+        return 1;
     }
 
     onGridReady = params => {
@@ -113,16 +124,18 @@ class Create_Zamowienia extends Component {
             for (var i = 0; i < data.length; i++) {
                 var d = data[i];
                 var artykul = this.findArtykul(d.artykulId);
-                var row = {
-                    idArtykul: artykul.idArtykul,
-                    nazwa: artykul.nazwa,
-                    kod: artykul.kod,
-                    illoscProduktow: artykul.illoscProduktow,
-                    illoscPodstawowa: artykul.illoscPodstawowa,
-                    cenaWZakupu: 0,
-                    liczba: d.illosc,
+                if (artykul) {
+                    var row = {
+                        idArtykul: artykul.IdArtykul,
+                        nazwa: artykul.Nazwa,
+                        kod: artykul.Kod,
+                        illoscProduktow: artykul.IlloscProduktow,
+                        illoscPodstawowa: artykul.IlloscPodstawowa,
+                        cenaWZakupu: this.findArtykulPrice(artykul.IdArtykul),
+                        liczba: d.illosc,
+                    }
+                    art_rowData.push(row);
                 }
-                art_rowData.push(row);
             }
         }
         return art_rowData;
@@ -147,6 +160,13 @@ class Create_Zamowienia extends Component {
             },
             {
                 headerName: "Liczba w zamowieniu", field: "liczba", sortable: true, editable: true,
+                valueSetter: function (params) {
+                    let tmp = parseInt(params.newValue, 10);
+                    if (isNaN(tmp) || tmp < 1) {
+                        tmp = 1;
+                    }
+                    return params.data.liczba = tmp;
+                },
             },
             {
                 headerName: "Suma", field: "suma",
@@ -172,55 +192,63 @@ class Create_Zamowienia extends Component {
 
     handleCreate() {
         this.handleWartoscUpdate();
-        var req = JSON.stringify({
-            dataZamowienia: this.state.order_date,
-            dataOplaty: this.state.payment_date,
-            dataDostawy: this.state.receive_date,
-            sumaZamowienia: this.state.wartosc,
-            hurtowniaIdHurtowni: this.state.hurtownia_id,
-            oplacono: this.state.oplacone == 1 ? false : true,
-            status: "zlozone",
-        });
-        console.log(req);
-        /*
-        body: (...)
-        bodyUsed: false
-        headers: Headers
-        ok: true
-        redirected: false
-        status: 201
-        statusText: "Created"
-        type: "basic"
-        url: "http://localhost:55810/api/Zamowienies"
-        */
-        fetch("/api/Zamowienies", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: req
-        }).then(response => response.json()).then(data => {
-            console.log(data);
-            this.gridApi.forEachNode(node => {
-                var req_partia = JSON.stringify({
-                    dataWaznosci: new Date(),
-                    artykulIdArtukulu: node.data.idArtykul,
-                    zamowienieIdZamowienia: data.idZamowienia,
-                    cenaWSprzedazy: 0,
-                    cenaWZakupu: node.data.cenaWZakupu,
-                    liczba: node.data.liczba,
-                    liczbaWSprzedazy: node.data.liczba,
-                    status: "Oczekiwane",
-                });
-                fetch("/api/Partias", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: req_partia
-                }).then(response => response.json()).then(data => console.log(data));
+        if (!this.state.hurtownia_id) {
+            window.alert("Brak wybranej Hurtowni");
+        }
+        else if (this.gridApi.getDisplayedRowCount() == 0) {
+            window.alert("Brak artykulów w zamowieniu");
+        }
+        else {
+            var req = JSON.stringify({
+                dataZamowienia: this.state.order_date,
+                dataOplaty: this.state.payment_date,
+                dataDostawy: this.state.receive_date,
+                sumaZamowienia: this.state.wartosc,
+                hurtowniaIdHurtowni: this.state.hurtownia_id,
+                oplacono: this.state.oplacone == 1 ? false : true,
+                status: "zlozone",
             });
-        }).then(setTimeout(this.refresh, 300));
+            console.log(req);
+            /*
+            body: (...)
+            bodyUsed: false
+            headers: Headers
+            ok: true
+            redirected: false
+            status: 201
+            statusText: "Created"
+            type: "basic"
+            url: "http://localhost:55810/api/Zamowienies"
+            */
+            fetch("/api/Zamowienies", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: req
+            }).then(response => response.json()).then(data => {
+                console.log(data);
+                this.gridApi.forEachNode(node => {
+                    var req_partia = JSON.stringify({
+                        dataWaznosci: new Date(),
+                        artykulIdArtukulu: node.data.idArtykul,
+                        zamowienieIdZamowienia: data.idZamowienia,
+                        cenaWSprzedazy: 1,
+                        cenaWZakupu: node.data.cenaWZakupu,
+                        liczba: node.data.liczba,
+                        liczbaWSprzedazy: node.data.liczba,
+                        status: "Oczekiwane",
+                    });
+                    fetch("/api/Partias", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: req_partia
+                    }).then(response => response.json()).then(data => console.log(data));
+                });
+            }).then(setTimeout(this.refresh, 300));
+        }
     }
 
     onSelectionChanged() {
@@ -234,24 +262,25 @@ class Create_Zamowienia extends Component {
     handleAdd() {
         if (this.state.selectedOption) {
             var s = this.state.selectedOption.value;
-            var row = this.gridApi.getRowNode(s.idArtykul);
+            var row = this.gridApi.getRowNode(s.IdArtykul);
             if (row) {
                 window.alert("Ten Artykuł już został dodany");
             }
             else {
                 var art_rowData = [];
                 var row = {
-                    idArtykul: s.idArtykul,
-                    nazwa: s.nazwa,
-                    kod: s.kod,
-                    illoscProduktow: s.illoscProduktow,
-                    illoscPodstawowa: s.illoscPodstawowa,
-                    cenaWZakupu: 0,
-                    liczba: 0,
+                    idArtykul: s.IdArtykul,
+                    nazwa: s.Nazwa,
+                    kod: s.Kod,
+                    illoscProduktow: s.IlloscProduktow,
+                    illoscPodstawowa: s.IlloscPodstawowa,
+                    cenaWZakupu: this.findArtykulPrice(s.IdArtykul),
+                    liczba: 1,
                 }
                 art_rowData.push(row);
                 this.gridApi.updateRowData({ add: art_rowData })
             }
+            this.handleWartoscUpdate();
         }
     }
 
@@ -332,6 +361,12 @@ class Create_Zamowienia extends Component {
         });
     }
 
+    onCellEditingStopped(e) {
+        //console.log(e);
+        //console.log(this.gridApi2);
+        this.handleWartoscUpdate();
+    }
+
     handleWartoscUpdate() {
         let sum = 0;
         this.gridApi.forEachNode(node => {
@@ -340,13 +375,13 @@ class Create_Zamowienia extends Component {
             let r = c * i;
             sum += r;
         });
-        console.log(sum);
+        sum = sum.toFixed(2);
         this.setState({ wartosc: sum });
     }
 
     render() {
         return (
-            <Container>
+            <Container fluid>
                 <Row>
                     <Col>
                         <Form>
@@ -412,13 +447,10 @@ class Create_Zamowienia extends Component {
                         </div>
                     </Col>
                     <Col>
-                        <Button className="btn btn-primary" type="button" onClick={this.handleAdd}>Dodaj</Button>
+                        <Button color="info" onClick={this.handleAdd}>Dodaj</Button>
                     </Col>
                     <Col>
-                        <Button className="btn btn-primary" type="button" onClick={this.handleDelete}>Delete</Button>
-                    </Col>
-                    <Col>
-                        <Button className="btn btn-primary" type="button" onClick={this.handleWartoscUpdate}>Wylicz lączną wartość</Button>
+                        <Button color="danger" onClick={this.handleDelete}>Delete</Button>
                     </Col>
                 </Row>
                 <Row>
@@ -435,12 +467,13 @@ class Create_Zamowienia extends Component {
                             rowSelection={this.state.rowSelection}
                             onSelectionChanged={this.onSelectionChanged.bind(this)}
                             getRowNodeId={this.state.getRowNodeId}
+                            onCellEditingStopped={this.onCellEditingStopped.bind(this)}
                         />
                     </div>
                 </Row>
                 <Row>
                     <FormGroup>
-                        <Button className="btn btn-primary" type="button" onClick={this.handleCreate}>Zlóz zamowienie</Button>
+                        <Button color="success" onClick={this.handleCreate}>Zlóz zamowienie</Button>
                     </FormGroup>
                 </Row>
             </Container>

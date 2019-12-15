@@ -212,7 +212,7 @@ class Listy_Brakow extends Component {
     render() {
         var date = new Date(this.state.lista.DataGen);
         return (
-            <Container>
+            <Container fluid>
                 <Row>
                     <Col>
                         <h4>Generowane Zamowienie</h4>
@@ -251,7 +251,7 @@ class Listy_Brakow extends Component {
                 <Row>
                     <Col>
                         <FormGroup>
-                            <Button className="btn btn-primary" type="button" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
+                            <Button color="success" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
                         </FormGroup>
                     </Col>
                 </Row>
