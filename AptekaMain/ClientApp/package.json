@@ -16,7 +16,7 @@
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
     "rimraf": "^2.6.2",
-    "validator": "^1.5.1",
+    "validator": "^12.1.0",
     "axios": "^0.19.0",
     "ag-grid-react": "^21.2.2",
     "ag-grid-community": "^21.2.2",

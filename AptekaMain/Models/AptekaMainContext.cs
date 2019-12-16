@@ -22,6 +22,7 @@ namespace AptekaMain.Models
         public virtual DbSet<Kategoria> Kategoria { get; set; }
         public virtual DbSet<ListaBrakow> ListaBrakow { get; set; }
         public virtual DbSet<Partia> Partia { get; set; }
+        public virtual DbSet<Pass> Pass { get; set; }
         public virtual DbSet<Photo> Photo { get; set; }
         public virtual DbSet<Pracownik> Pracownik { get; set; }
         public virtual DbSet<Producent> Producent { get; set; }
@@ -218,6 +219,24 @@ namespace AptekaMain.Models
                     .HasConstraintName("partia_zamowienie_fk");
             });
 
+            modelBuilder.Entity<Pass>(entity =>
+            {
+                entity.HasKey(e => e.IdPass);
+
+                entity.Property(e => e.IdPass).HasColumnName("id_pass");
+
+                entity.Property(e => e.IdPracownika).HasColumnName("id_pracownika");
+
+                entity.Property(e => e.PassHash)
+                    .HasColumnName("pass_hash")
+                    .HasMaxLength(100);
+
+                entity.HasOne(d => d.IdPracownikaNavigation)
+                    .WithMany(p => p.Pass)
+                    .HasForeignKey(d => d.IdPracownika)
+                    .HasConstraintName("FK__Pass__id_pracown__160F4887");
+            });
+
             modelBuilder.Entity<Photo>(entity =>
             {
                 entity.HasKey(e => e.IdPhoto);
@@ -254,10 +273,6 @@ namespace AptekaMain.Models
 
                 entity.Property(e => e.Email)
                     .HasColumnName("email")
-                    .HasMaxLength(50);
-
-                entity.Property(e => e.Haslo)
-                    .HasColumnName("haslo")
                     .HasMaxLength(50);
 
                 entity.Property(e => e.Imie)

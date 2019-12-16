@@ -14,10 +14,10 @@ namespace AptekaMain.Models
         public DateTime? DataZamowienia { get; set; }
         public DateTime? DataOplaty { get; set; }
         public DateTime? DataDostawy { get; set; }
-        public long? SumaZamowienia { get; set; }
         public int HurtowniaIdHurtowni { get; set; }
         public bool? Oplacono { get; set; }
         public string Status { get; set; }
+        public double? SumaZamowienia { get; set; }
 
         public Hurtownia HurtowniaIdHurtowniNavigation { get; set; }
         public ICollection<Partia> Partia { get; set; }

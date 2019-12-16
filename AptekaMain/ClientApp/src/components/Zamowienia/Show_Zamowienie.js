@@ -321,18 +321,18 @@ class Show_Zamowienie extends Component {
                 <Row>
                     <Col>
                         <FormGroup>
-                            <Button className="btn btn-primary" type="button" onClick={this.handleUpdate}>Zapisz zmiany</Button>
+                            <Button color="info" onClick={this.handleUpdate}>Zapisz zmiany</Button>
                         </FormGroup>
                     </Col>
                     {this.state.status == "zlozone" && <div>
                         <Col>
                             <FormGroup>
-                                <Button className="btn btn-primary" type="button" onClick={this.handleCancel}>Odrzyć zamowienie</Button>
+                                <Button color="danger" onClick={this.handleCancel}>Odrzyć zamowienie</Button>
                             </FormGroup>
                         </Col>
                         <Col>
                             <FormGroup>
-                                <Button className="btn btn-primary" type="button" onClick={this.handleAccept}>Przjmij zamowienie</Button>
+                                <Button color="success" onClick={this.handleAccept}>Przjmij zamowienie</Button>
                             </FormGroup>
                         </Col>
                     </div>

@@ -462,7 +462,6 @@ class Batches extends Component {
                 <Row>
                     <Col>
                         <h4>Wydzial </h4>
-                        {date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
                     </Col>
                     <Col>
                         <h4>Sprzedaz</h4>

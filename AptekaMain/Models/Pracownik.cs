@@ -7,6 +7,7 @@ namespace AptekaMain.Models
     {
         public Pracownik()
         {
+            Pass = new HashSet<Pass>();
             UserSession = new HashSet<UserSession>();
         }
 
@@ -15,10 +16,10 @@ namespace AptekaMain.Models
         public string Nazwisko { get; set; }
         public int? PoziomDostepu { get; set; }
         public int? WydzialAptekiIdWydzialu { get; set; }
-        public string Haslo { get; set; }
         public string Email { get; set; }
 
         public Wydzial WydzialAptekiIdWydzialuNavigation { get; set; }
+        public ICollection<Pass> Pass { get; set; }
         public ICollection<UserSession> UserSession { get; set; }
     }
 }

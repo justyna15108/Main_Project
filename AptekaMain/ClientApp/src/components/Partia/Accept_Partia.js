@@ -41,6 +41,7 @@ class Accept_Partia extends Component {
         this.getShortDate = this.getShortDate.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.sendToNext = this.sendToNext.bind(this);
+        this.count_total = this.count_total.bind(this);
     }
 
     async componentDidMount() {
@@ -110,8 +111,8 @@ class Accept_Partia extends Component {
         for (var i = 0; i < wydz.length; i++) {
             var wyd = wydz[i];
             var row = {
-                Kod: ""+this.state.idPartia+"-"+i,
-                Liczba: this.state.Liczba / wydz.length,
+                Kod: ""+this.state.idPartia + i,
+                Liczba: parseInt(this.state.Liczba / wydz.length, 10),
                 idWydzial: wyd.idWydzial,
             }
             part_rowData.push(row);
@@ -121,45 +122,52 @@ class Accept_Partia extends Component {
     }
 
     handleUpdate() {
-
-        fetch("api/Partias/" + this.state.partia.IdPartia, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                idPartia: this.state.partia.IdPartia,
-                DataWaznosci: this.state.due_date,
-                ZamowienieIdZamowienia: this.state.partia.ZamowienieIdZamowienia,
-                artykulIdArtukulu: this.state.partia.ArtykulIdArtukulu,
-                Status: "przyjęta",
-                CenaWSprzedazy: this.state.CenaWSprzedazy,
-                CenaWZakupu: this.state.CenaWZakupu,
-                Liczba: this.state.Liczba,
-                LiczbaWSprzedazy: this.state.LiczbaWSprzedazy,
-            })
-        }).then(data => {
-            console.log(data);
-            this.gridApi.forEachNode(node => {
-                var req_partia = JSON.stringify({
-                    "kod": node.data.Kod,
-                    "liczba": node.data.Liczba,
-                    "wydzialAptekiIdWydzialu": node.data.idWydzial,
-                    "idPartia": this.state.partia.IdPartia,
-                });
-                console.log(req_partia);
-                fetch("/api/Batches", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: req_partia
-                }).then(response => response.json()).then(data => console.log(data));
-            })
-        }).then(
-            setTimeout(this.state.length === this.state.current_location ? this.refresh : this.sendToNext, 300));
+        if (this.state.suma !== parseInt(this.state.Liczba,10)) {
+            window.alert("Nie zgadza sie liczba w batchu");
+        }
+        else {
+            fetch("api/Partias/" + this.state.partia.IdPartia, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idPartia: this.state.partia.IdPartia,
+                    DataWaznosci: this.state.due_date,
+                    ZamowienieIdZamowienia: this.state.partia.ZamowienieIdZamowienia,
+                    artykulIdArtukulu: this.state.partia.ArtykulIdArtukulu,
+                    Status: "przyjęta",
+                    CenaWSprzedazy: this.state.CenaWSprzedazy,
+                    CenaWZakupu: this.state.CenaWZakupu,
+                    Liczba: this.state.Liczba,
+                    LiczbaWSprzedazy: this.state.LiczbaWSprzedazy,
+                })
+            }).then(data => {
+                console.log(data);
+                this.gridApi.forEachNode(node => {
+                    var req_partia = JSON.stringify({
+                        "kod": node.data.Kod,
+                        "liczba": node.data.Liczba,
+                        "wydzialAptekiIdWydzialu": node.data.idWydzial,
+                        "idPartia": this.state.partia.IdPartia,
+                    });
+                    console.log(req_partia);
+                    fetch("/api/Batches", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: req_partia
+                    }).then(response => response.json()).then(data => console.log(data));
+                })
+            }).then(
+                setTimeout(this.state.length === this.state.current_location ? this.refresh : this.sendToNext, 300));
+        }
     }
 
+    handleSkip() {
+        this.sendToNext();
+    }
 
     sendToNext() {
         this.props.history.push("");
@@ -174,14 +182,24 @@ class Accept_Partia extends Component {
         let cols = [
             {
                 headerName: "Kod", field: "Kod", sortable: true, filter: false, editable: true,
+                valueSetter: function (params) {
+                    let tmp = parseInt(params.newValue, 10);
+                    if (isNaN(tmp) || tmp < 1) {
+                        tmp = 1;
+                    }
+                    return params.data.Kod = tmp;
+                },
             },
             {
                 headerName: "Widział", field: "idWydzial", sortable: true, filter: true, editable: false,
             },
             {
-                headerName: "Illosc w batchu", field: "Liczba", sortable: true, filter: true, editable: false,
+                headerName: "Illosc w batchu", field: "Liczba", sortable: true, filter: true, editable: true,
                 valueSetter: function (params) {
                     let tmp = parseInt(params.newValue, 10);
+                    if (isNaN(tmp) || tmp < 1) {
+                        tmp = 1;
+                    }
                     return params.data.Liczba = tmp;
                 },
             }
@@ -227,10 +245,21 @@ class Accept_Partia extends Component {
         this.setState({ suma: sum });
     }
 
+    onCellEditingStopped(e) {
+        this.count_total();
+    }
+
+    count_numbers() {
+        let sum = 0;
+        this.gridApi.forEachNode(node => {
+            sum += node.data.Liczba;
+        });
+    }
+
     render() {
         console.log(this.state);
         return (
-            <Container fluid>
+            <Container>
                 <Row>
                     <Col>
                         <FormGroup>
@@ -268,6 +297,7 @@ class Accept_Partia extends Component {
                             context={this.state.context}
                             frameworkComponents={this.state.frameworkComponents}
                             onGridReady={this.onGridReady}
+                            onCellEditingStopped={this.onCellEditingStopped.bind(this)}
                         //  rowSelection={this.state.rowSelection}
                         //  onSelectionChanged={this.onSelectionChanged.bind(this)}
                         />

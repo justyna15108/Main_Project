@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AptekaMain.Models;
 using Microsoft.AspNet.OData;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace AptekaMain.Controllers
 {
@@ -91,13 +93,14 @@ namespace AptekaMain.Controllers
         {
             var email = user_login.Email;
             var password = user_login.Password;
+            var username = user_login.UserName;
             var user=await _context.Pracownik.SingleOrDefaultAsync(u => u.Email == email);
-
+            var pass = await _context.Pass.SingleOrDefaultAsync(u => u.IdPracownika == user.IdPracownika);
             if(user == null)
             {
                 return NotFound();
             }
-            if (user.Haslo != password)
+            if (!VerifySha256Hash(password,pass.PassHash))
             {
                 return BadRequest(new {errors="WrongPassword" });
             }
@@ -137,5 +140,36 @@ namespace AptekaMain.Controllers
         {
             return _context.UserSession.Any(e => e.IdSession == id);
         }
+
+        private string GetSha256Hash(string rawData)
+        {  
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        private bool VerifySha256Hash(string input, string hash)
+        {
+            string hashOfInput = GetSha256Hash(input);
+
+            StringComparer comparer = StringComparer.OrdinalIgnoreCase;
+
+            if (0 == comparer.Compare(hashOfInput, hash))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
 }

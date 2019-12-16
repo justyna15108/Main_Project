@@ -71,7 +71,7 @@ class Show_Partia extends Component {
         params.api.sizeColumnsToFit();
     }
 
-    getShortDate(json_date){
+    getShortDate(json_date) {
         let full_date = new Date(json_date);
         return full_date.toLocaleDateString();
     }
@@ -174,6 +174,10 @@ class Show_Partia extends Component {
         }
     }
 
+    handleReturn() {
+        this.props.history.push('/show_zamowienie/' + this.state.partia.ZamowienieIdZamowienia);
+    }
+
 
     render() {
         console.log(this.state);
@@ -241,6 +245,9 @@ class Show_Partia extends Component {
                         </div>
                     </Row>
                 }
+                <Row>
+                    <Button color="info" onClick={this.handleReturn.bind(this)}>Return</Button>
+                </Row>
             </Container>
         );
     }

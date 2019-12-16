@@ -6,7 +6,9 @@ import { Button, Form, FormGroup, Label, Input, FormText, Table, Container, Row,
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/dist/styles/ag-grid.css';
 import 'ag-grid-community/dist/styles/ag-theme-balham.css';
-
+import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
+import 'ag-grid-community/dist/styles/ag-theme-dark.css';
+import 'ag-grid-community/dist/styles/ag-theme-blue.css';
 class Listy_Brakow extends Component {
 
     constructor(props) {
@@ -223,6 +225,14 @@ class Listy_Brakow extends Component {
                 </Row>
                 <Row>
                     <Col>
+                        <p> </p>
+                    </Col>
+                    <Col>
+                        {date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
                         <div style={{ height: '500px' }} className="ag-theme-balham">
                             <AgGridReact
                                 columnDefs={this.state.columnDefs2}
@@ -235,8 +245,7 @@ class Listy_Brakow extends Component {
                         </div>
                     </Col>
                     <Col>
-                        <div style={{ height: '500px' }} className="ag-theme-balham">
-                            {date && <p>Lista Braków dnia {this.state.lista.DataGen}</p>}
+                        <div style={{ height: '500px' }} className="ag-theme-fresh">
                             <AgGridReact
                                 columnDefs={this.state.columnDefs}
                                 rowData={this.state.rowData}

@@ -47,7 +47,7 @@ class Login_Form extends Component {
                 break;
             case 'password':
                 this.setState({ password: value })
-                if (validator.isAlphanumeric(value) && value.length > 4) {
+                if (value.length > 4) {
                     this.setState({ password_err: '' })
                 }
                 else
@@ -75,7 +75,7 @@ class Login_Form extends Component {
                             {this.state.errors.email_err > 0 && <p>this.state.email_err</p>}
                         </FormGroup>
                         <FormGroup>
-                            <Label htmlFor="password" class="control-label">Email</Label>
+                            <Label htmlFor="password" class="control-label">Password</Label>
                             <Input type="text" className="form-control" name="password" value={this.state.password} onChange={this.onChange} />
                             {this.state.password_err.length > 0 && <p>this.state.password_err</p>}
                         </FormGroup>

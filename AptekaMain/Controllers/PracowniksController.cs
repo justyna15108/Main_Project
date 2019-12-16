@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AptekaMain.Models;
 using Microsoft.AspNet.OData;
+using System.Text;
+using System.Security.Cryptography;
+
 
 namespace AptekaMain.Controllers
 {
@@ -86,16 +89,19 @@ namespace AptekaMain.Controllers
 
         // POST: api/Pracowniks
         [HttpPost]
-        public async Task<IActionResult> PostPracownik([FromBody] Pracownik pracownik)
+        public async Task<IActionResult> PostPracownik([FromBody] User_data pr)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            Pracownik pracownik = new Pracownik() { Imie = pr.Imie, Nazwisko = pr.Nazwisko, Email = pr.Email, PoziomDostepu = pr.PoziomDostepu, WydzialAptekiIdWydzialu = pr.WydzialAptekiIdWydzialu};            
             _context.Pracownik.Add(pracownik);
             await _context.SaveChangesAsync();
-
+            Pass pass = new Pass() { IdPracownika=pracownik.IdPracownika,PassHash=GetSha256Hash(pr.Haslo)};
+            _context.Pass.Add(pass);
+            await _context.SaveChangesAsync();
             return CreatedAtAction("GetPracownik", new { id = pracownik.IdPracownika }, pracownik);
         }
 
@@ -123,6 +129,20 @@ namespace AptekaMain.Controllers
         private bool PracownikExists(int id)
         {
             return _context.Pracownik.Any(e => e.IdPracownika == id);
+        }
+
+        private string GetSha256Hash(string rawData)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+                StringBuilder builder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    builder.Append(bytes[i].ToString("x2"));
+                }
+                return builder.ToString();
+            }
         }
     }
 }

@@ -188,6 +188,7 @@ class Create_Zamowienia extends Component {
         let rows = this.setRowData();
         let cols = this.setColumns();
         this.setState({ columnDefs: cols, rowData: rows, loading_table: false });
+        this.handleWartoscUpdate();
     }
 
     handleCreate() {

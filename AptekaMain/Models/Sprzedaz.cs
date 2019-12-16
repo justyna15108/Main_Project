@@ -13,11 +13,11 @@ namespace AptekaMain.Models
 
         public int IdSprzedaz { get; set; }
         public DateTime? DataSprzedazy { get; set; }
-        public long? Suma { get; set; }
         public int? RabatIdRabatu { get; set; }
         public string TypOplaty { get; set; }
         public bool? WymaganaRecepta { get; set; }
         public bool? ReceptaDolaczona { get; set; }
+        public double? Suma { get; set; }
 
         public Rabat RabatIdRabatuNavigation { get; set; }
         public ICollection<ScanRecepty> ScanRecepty { get; set; }
