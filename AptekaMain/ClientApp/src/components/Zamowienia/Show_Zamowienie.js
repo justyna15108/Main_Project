@@ -31,11 +31,9 @@ class Show_Zamowienie extends Component {
         this.setColumns = this.setColumns.bind(this);
         this.getTableData = this.getTableData.bind(this);
         this.handleRedirect = this.handleRedirect.bind(this);
-        this.handleUpdate = this.handleUpdate.bind(this);
         this.getShortDate = this.getShortDate.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleAccept = this.handleAccept.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
+        this.handleNormilizeDate = this.handleNormilizeDate.bind(this);
     }
 
     async componentDidMount() {
@@ -156,6 +154,7 @@ class Show_Zamowienie extends Component {
     }
 
     handleUpdate() {
+        this.handleNormilizeDate();
         fetch("api/Zamowienies/" + this.state.zamowienie.idZamowienia, {
             method: 'PUT',
             headers: {
@@ -163,9 +162,9 @@ class Show_Zamowienie extends Component {
             },
             body: JSON.stringify({
                 idZamowienia: this.state.zamowienie.idZamowienia,
-                dataZamowienia: this.state.order_date,
-                dataOplaty: this.state.payment_date,
-                dataDostawy: this.state.receive_date,
+                dataZamowienia: this.state.order_date.toUTCString(),
+                dataOplaty: this.state.payment_date.toUTCString(),
+                dataDostawy: this.state.receive_date.toUTCString(),
                 sumaZamowienia: this.state.zamowienie.sumaZamowienia,
                 hurtowniaIdHurtowni: this.state.zamowienie.hurtowniaIdHurtowni,
                 oplacono: this.state.oplacone,
@@ -175,6 +174,7 @@ class Show_Zamowienie extends Component {
     }
 
     handleCancel() {
+        this.handleNormilizeDate();
         fetch("api/Zamowienies/" + this.state.zamowienie.idZamowienia, {
             method: 'PUT',
             headers: {
@@ -205,25 +205,28 @@ class Show_Zamowienie extends Component {
     }
 
     handleOrderDateChange = date => {
+        date.setHours(date.getHours() +12);
         this.setState({
             order_date: date
         });
     }
 
     handlePaymentDateChange = date => {
+        date.setHours(date.getHours() + 12);
         this.setState({
             payment_date: date
         });
     }
 
     handleReceiveDateChange = date => {
+        date.setHours(date.getHours() + 12);
         this.setState({
             receive_date: date
         });
     }
 
     handleAccept() {
-
+        this.handleNormilizeDate();
         fetch("api/Zamowienies/" + this.state.zamowienie.idZamowienia, {
             method: 'PUT',
             headers: {
@@ -240,11 +243,22 @@ class Show_Zamowienie extends Component {
                 status: "W sprzedaży"
             })
         }).then(resp => console.log(resp.status)).then(
-        this.props.history.push({
-            pathname: '/accept_partia',
-            state: { partii: this.state.partii, length: this.state.partii.length - 1, current_location: 0 }
-        })
+            this.props.history.push({
+                pathname: '/accept_partia',
+                state: { partii: this.state.partii, length: this.state.partii.length - 1, current_location: 0 }
+            })
         );
+    }
+
+    handleNormilizeDate() {
+        this.state.order_date.setHours(this.state.order_date.getHours() + 1);
+        this.state.receive_date.setHours(this.state.receive_date.getHours() + 1);
+        this.state.payment_date.setHours(this.state.payment_date.getHours() + 1);
+    }
+
+
+    handleReturn() {
+        this.refresh();
     }
 
     render() {
@@ -319,24 +333,22 @@ class Show_Zamowienie extends Component {
                     </div>
                 </Row>
                 <Row>
-                    <Col>
-                        <FormGroup>
-                            <Button color="info" onClick={this.handleUpdate}>Zapisz zmiany</Button>
-                        </FormGroup>
+                    <Col sm="1">
+                        <Button color="info" onClick={this.handleUpdate.bind(this)}>Zapisz zmiany</Button>
                     </Col>
-                    {this.state.status == "zlozone" && <div>
-                        <Col>
-                            <FormGroup>
-                                <Button color="danger" onClick={this.handleCancel}>Odrzyć zamowienie</Button>
-                            </FormGroup>
+                    {this.state.status == "zlozone" &&
+                        <Col sm="auto">
+                        <Button color="danger" onClick={this.handleCancel.bind(this)}>Odrzyć zamowienie</Button>
                         </Col>
-                        <Col>
-                            <FormGroup>
-                                <Button color="success" onClick={this.handleAccept}>Przjmij zamowienie</Button>
-                            </FormGroup>
-                        </Col>
-                    </div>
                     }
+                    {this.state.status == "zlozone" &&
+                        <Col sm="auto">
+                        <Button color="success" onClick={this.handleAccept.bind(this)}>Przyjmij zamowienie</Button>
+                        </Col>
+                    }
+                    <Col sm = "1">
+                        <Button color="secondary" onClick={this.handleReturn.bind(this)}>Return</Button>
+                    </Col>
                 </Row>
             </Container>
         );

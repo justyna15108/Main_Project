@@ -25,7 +25,7 @@ class Sprzedazy extends Component {
     }
 
     async componentDidMount() {
-        await fetch('/api/Sprzedaz?$filter=idSprzedaz ne 1')
+        await fetch('/api/Sprzedaz?$expand=scanRecepty($select=IdScan;$top=1)&$filter=idSprzedaz ne 1')
             .then(response => response.json())
             .then(data => {
                 this.setState({ sprzedazy: data, loading_data: false });
@@ -50,11 +50,12 @@ class Sprzedazy extends Component {
         for (var i = 0; i < sprz.length; i++) {
             var spr = sprz[i];
             var row = {
-                idSprzedaz: spr.idSprzedaz,
-                suma: spr.suma,
-                dataSprzedazy: spr.dataSprzedazy,
-                typOplaty: spr.typOplaty,
-                wymaganaRecepta: spr.wymaganaRecepta,
+                idSprzedaz: spr.IdSprzedaz,
+                suma: spr.Suma,
+                dataSprzedazy: spr.DataSprzedazy,
+                typOplaty: spr.TypOplaty,
+                wymaganaRecepta: spr.WymaganaRecepta,
+                jestOK: (spr.WymaganaRecepta && spr.ScanRecepty.length === 0) ? false : true
             }
 
             user_rowData.push(row);
@@ -78,6 +79,9 @@ class Sprzedazy extends Component {
             },
             {
                 headerName: "wymaganaRecepta", field: "wymaganaRecepta", sortable: true, filter: true
+            },
+            {
+                headerName: "jestOK", field: "jestOK",
             }
         ]
         return cols;
@@ -113,22 +117,22 @@ class Sprzedazy extends Component {
                     rowSelection={this.state.rowSelection}
                     onSelectionChanged={this.onSelectionChanged.bind(this)}
                     getRowStyle={function (params) {
-                        if (params.data.wymaganaRecepta === true) {
+                        if (params.data.jestOK === false) {
                             return {
-                                'background-color': '#ffb2b2',
-                                'color': '#F4F8F5'
+                                'background-color': '#ff6666'
                             };
-                        } else if (params.data.wymaganaRecepta === false) {
+                        } else if (params.data.wymaganaRecepta === true) {
                             return {
-                                'background-color': '#b2ffb2'
+                                'background-color': '#ffcc00',
                             };
                         }
-                        return null;
-                    }
-
-                    }
-
-                />
+                        else {
+                            return {
+                                'background-color': '#39e600',
+                            };
+                        }
+                    } }
+            />
             </div>
         );
     }

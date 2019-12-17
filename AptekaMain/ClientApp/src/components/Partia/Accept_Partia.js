@@ -42,6 +42,7 @@ class Accept_Partia extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
         this.sendToNext = this.sendToNext.bind(this);
         this.count_total = this.count_total.bind(this);
+        this.findArtykulPrice = this.findArtykulPrice.bind(this); 
     }
 
     async componentDidMount() {
@@ -67,7 +68,7 @@ class Accept_Partia extends Component {
             suma: partia.Liczba,
             Artykul: partia.ArtykulIdArtukuluNavigation.Nazwa,
         });
-        await fetch('api/Artykuls?$select=idArtykul, nazwa, illoscPodstawowa')
+        await fetch('api/Artykuls?$expand=partia($orderby=IdPartia desc;$top=1)')
             .then(response => response.json())
             .then(data => {
                 this.setState({ artykuls: data });
@@ -78,6 +79,7 @@ class Accept_Partia extends Component {
                 this.setState({ wydzialy: data });
             });
         this.getTableData();
+        this.count_total();
     }
 
     findArtykulName(id) {
@@ -87,6 +89,18 @@ class Accept_Partia extends Component {
                 return arts[i].Nazwa;
         };
         return "Artykul not Found";
+    }
+
+    findArtykulPrice(id) {
+        var art = this.state.artykuls;
+        for (var i in art) {
+            if (id === art[i].IdArtykul)
+                if (art[i].Partia.length > 0)
+                    return art[i].Partia[0].CenaWSprzedazy;
+                else
+                    return 1;
+        }
+        return 1;
     }
 
     refresh() {
@@ -111,7 +125,7 @@ class Accept_Partia extends Component {
         for (var i = 0; i < wydz.length; i++) {
             var wyd = wydz[i];
             var row = {
-                Kod: ""+this.state.idPartia + i,
+                Kod: "" + this.state.idPartia + i,
                 Liczba: parseInt(this.state.Liczba / wydz.length, 10),
                 idWydzial: wyd.idWydzial,
             }
@@ -122,7 +136,7 @@ class Accept_Partia extends Component {
     }
 
     handleUpdate() {
-        if (this.state.suma !== parseInt(this.state.Liczba,10)) {
+        if (this.state.suma !== parseInt(this.state.Liczba, 10)) {
             window.alert("Nie zgadza sie liczba w batchu");
         }
         else {
@@ -145,21 +159,24 @@ class Accept_Partia extends Component {
             }).then(data => {
                 console.log(data);
                 this.gridApi.forEachNode(node => {
-                    var req_partia = JSON.stringify({
-                        "kod": node.data.Kod,
-                        "liczba": node.data.Liczba,
-                        "wydzialAptekiIdWydzialu": node.data.idWydzial,
-                        "idPartia": this.state.partia.IdPartia,
-                    });
-                    console.log(req_partia);
-                    fetch("/api/Batches", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: req_partia
-                    }).then(response => response.json()).then(data => console.log(data));
-                })
+                    if (node.data.Liczba > 0) {
+                        var req_partia = JSON.stringify({
+                            "kod": node.data.Kod,
+                            "liczba": node.data.Liczba,
+                            "wydzialAptekiIdWydzialu": node.data.idWydzial,
+                            "idPartia": this.state.partia.IdPartia,
+                        });
+                        console.log(req_partia);
+                        fetch("/api/Batches", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: req_partia
+                        }).then(response => response.json()).then(data => console.log(data));
+                    }
+                }
+                )
             }).then(
                 setTimeout(this.state.length === this.state.current_location ? this.refresh : this.sendToNext, 300));
         }
@@ -197,8 +214,8 @@ class Accept_Partia extends Component {
                 headerName: "Illosc w batchu", field: "Liczba", sortable: true, filter: true, editable: true,
                 valueSetter: function (params) {
                     let tmp = parseInt(params.newValue, 10);
-                    if (isNaN(tmp) || tmp < 1) {
-                        tmp = 1;
+                    if (isNaN(tmp) || tmp < 0) {
+                        tmp = 0;
                     }
                     return params.data.Liczba = tmp;
                 },
@@ -261,13 +278,11 @@ class Accept_Partia extends Component {
         return (
             <Container>
                 <Row>
-                    <Col>
-                        <FormGroup>
-                            <Label htmlFor="artykul">Artykuł</Label>
-                            <p className="form-control" name="artykul"> {this.state.Artykul} </p>
-                        </FormGroup>
+                    <Col xs="3">
+                        <Label htmlFor="artykul">Artykuł</Label>
+                        <p className="form-control" name="artykul"> {this.state.Artykul} </p>
                     </Col>
-                    <Col>
+                    <Col xs="3" md={{ size: 2, offset: 4 }}>
                         <Label>Termin Ważnosci</Label>
                         <DatePicker
                             selected={this.state.due_date}
@@ -276,21 +291,17 @@ class Accept_Partia extends Component {
                     </Col>
                 </Row>
                 <Row>
-                    <Col>
-                        <FormGroup>
-                            <Label htmlFor="Liczba">Illosc zakupu</Label>
-                            <Input type="number" className="form-control" name="Liczba" value={this.state.Liczba} onChange={this.handleInputChange} />
-                        </FormGroup>
+                    <Col xs="3">
+                        <Label htmlFor="Liczba">Illosc zakupu</Label>
+                        <Input type="number" className="form-control" name="Liczba" value={this.state.Liczba} onChange={this.handleInputChange} />
                     </Col>
-                    <Col>
-                        <FormGroup>
-                            <Label htmlFor="CenaWSprzedazy">Cena w sprzedazy</Label>
-                            <Input type="number" className="form-control" name="CenaWSprzedazy" value={this.state.CenaWSprzedazy} onChange={this.handleInputChange} />
-                        </FormGroup>
+                    <Col xs="3" md={{ size: 2, offset: 4 }}>
+                        <Label htmlFor="CenaWSprzedazy">Cena w sprzedazy</Label>
+                        <Input type="number" className="form-control" name="CenaWSprzedazy" value={this.state.CenaWSprzedazy} onChange={this.handleInputChange} />
                     </Col>
                 </Row>
                 <Row>
-                    <div style={{ height: '500px', width: "100%" }} className="ag-theme-balham">
+                    <div style={{ height: '500px', width: '80%' }} className="ag-theme-balham">
                         <AgGridReact
                             columnDefs={this.state.columnDefs}
                             rowData={this.state.rowData}

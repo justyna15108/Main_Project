@@ -38,7 +38,8 @@ class Batches extends Component {
             open: false,
             list: [],
             typOplaty: "Gotówka",
-            sprzedaz_id: ''
+            sprzedaz_id: '',
+            recepta_need: false
         };
 
         this.refresh = this.refresh.bind(this);
@@ -61,6 +62,8 @@ class Batches extends Component {
         this.get_recepta_need = this.get_recepta_need.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.findRabat = this.findRabat.bind(this);
+        this.findArtykulRecepta = this.findArtykulRecepta.bind(this);
+        this.check_recepta_need = this.check_recepta_need.bind(this);
     }
 
     async componentDidMount() {
@@ -91,6 +94,15 @@ class Batches extends Component {
                 return arts[i].Nazwa;
         };
         return "Artykul not Found";
+    }
+
+    findArtykulRecepta(id) {
+        var arts = this.state.artykuls;
+        for (var i in arts) {
+            if (id === arts[i].IdArtykul)
+                return arts[i].WymaganaRecepta;
+        };
+        return false;
     }
 
     findProducentName(id) {
@@ -166,7 +178,8 @@ class Batches extends Component {
                 LiczbaWybrana: 1,
                 Producent: this.findProducentName(batch.IdPartiaNavigation.ArtykulIdArtukulu),
                 Kraj: this.findProducentKraj(batch.IdPartiaNavigation.ArtykulIdArtukulu),
-                Kategoria: this.findKategoria(batch.IdPartiaNavigation.ArtykulIdArtukulu)
+                Kategoria: this.findKategoria(batch.IdPartiaNavigation.ArtykulIdArtukulu),
+                WymaganaRecepta: this.findArtykulRecepta(batch.IdPartiaNavigation.ArtykulIdArtukulu)
             }
             brak_rowData.push(row);
         }
@@ -206,13 +219,16 @@ class Batches extends Component {
                 headerName: "Producent", field: "Producent", sortable: true, filter: true, editable: false, width: 150
             },
             {
-                headerName: "Kraj Producenta", field: "Kraj", sortable: true, filter: true, editable: false, width: 150
+                headerName: "Kraj Producenta", field: "Kraj", sortable: true, filter: true, editable: false, width: 130
             },
             {
                 headerName: "Kategoria", field: "Kategoria", sortable: true, filter: true, editable: false, width: 100
             },
             {
                 headerName: "LiczbaWybrana", field: "LiczbaWybrana", hide: true,
+            },
+            {
+                headerName: "WymaganaRecepta", field: "WymaganaRecepta", hide: true
             }
         ]
         return cols;
@@ -260,9 +276,10 @@ class Batches extends Component {
             },
             {
                 headerName: "LiczbaWybrana", field: "LiczbaWybrana", editable: true, type: "valueColumn", valueSetter: function (params) {
-                    let tmp = Number(params.newValue);
-                    if (tmp < 1)
+                    let tmp = parseInt(params.newValue, 10);
+                    if (isNaN(tmp) || tmp < 1) {
                         tmp = 1;
+                    }
                     else if (tmp > params.data.Liczba)
                         tmp = params.data.Liczba;
                     return params.data.LiczbaWybrana = tmp;
@@ -279,7 +296,9 @@ class Batches extends Component {
             {
                 headerName: "deleteRenderer", field: "tmp", cellRenderer: "deleteRenderer", colId: "delete"
             },
-
+            {
+                headerName: "WymaganaRecepta", field: "WymaganaRecepta", hide: true,
+            }
 
         ]
         return cols;
@@ -351,6 +370,7 @@ class Batches extends Component {
         //console.log(e);
         //console.log(this.gridApi2);
         this.handlesumUpdate();
+        this.gridApi2.deselectAll();
     }
 
 
@@ -367,6 +387,9 @@ class Batches extends Component {
     togglePopUp() {
         this.create_list();
         this.setState({ open: true });
+        let rn = this.get_recepta_need();
+        console.log(rn);
+        this.setState({ recepta_need: rn })
     }
 
     hide() {
@@ -454,6 +477,14 @@ class Batches extends Component {
         return false;
     }
 
+    check_recepta_need() {
+        this.gridApi2.forEachNode(node => {
+            if (node.data.WymaganaRecepta==true)
+                return true;
+        });
+        return false;
+    }
+     
     render() {
         var date = new Date(this.state.lista.DataGen);
         //var comp = numericCellEditor: NumericCellEditor};
@@ -477,15 +508,19 @@ class Batches extends Component {
                                 onGridReady={this.onGridReady}
                                 rowSelection={this.state.rowSelection}
                                 onSelectionChanged={this.onSelectionChanged.bind(this)}
+                                getRowStyle={function (params) {
+                                    if (params.data.WymaganaRecepta === true) {
+                                        return {
+                                            'background-color': '#ff9900'
+                                        };
+                                    }
+                                    return null;
+                                }
+                                }
                             />
                         </div>
                     </Col>
                     <Col>
-                        <select className="form-control" name="rabat" value={this.state.rabat} onChange={this.handleInputChange}>
-                            {this.state.rabats.map(rabat =>
-                                <option key={rabat.idRabat} value={rabat.idRabat} >{rabat.procentRabatu}%</option>
-                            )}
-                        </select>
                         <div style={{ height: '500px' }} className="ag-theme-blue">
                             <AgGridReact
                                 columnDefs={this.state.columnDefs2}
@@ -496,15 +531,26 @@ class Batches extends Component {
                                 rowSelection={this.state.rowSelection}
                                 onSelectionChanged={this.onSelectionChanged2.bind(this)}
                                 onCellEditingStopped={this.onCellEditingStopped.bind(this)}
-                            />
+                                suppressRowClickSelection={true}
+                                onCellClicked={function (e) {
+                                    if (e.column.colId == 'delete') { // cell is from non-select column
+                                        e.node.setSelected(true)
+                                    }
+                                }}                           
+                         />
                         </div>
                     </Col>
                 </Row>
                 <Row>
-                    <Col>
-                        <FormGroup>
-                            <Button className="btn btn-primary" type="button" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
-                        </FormGroup>
+                    <Col sm="1">
+                        Rabat:
+                    </Col>
+                    <Col sm="2">
+                        <select className="form-control" name="rabat" value={this.state.rabat} onChange={this.handleInputChange}>
+                            {this.state.rabats.map(rabat =>
+                                <option key={rabat.idRabat} value={rabat.idRabat} >{rabat.procentRabatu}%</option>
+                            )}
+                        </select>
                     </Col>
                 </Row>
                 <Row>
@@ -519,12 +565,19 @@ class Batches extends Component {
                     }}
                     />
                 }
-                <Podsumowanie isopen={this.state.open} hide={this.hide} list={this.state.list} suma={this.state.suma} accept={this.handleAccept} />
-                <Button onClick={this.togglePopUp}>Podsumowanie</Button>
+                <Podsumowanie isopen={this.state.open} recepta_need={this.state.recepta_need} hide = { this.hide } list={this.state.list} suma={this.state.suma} accept={this.handleAccept} />
+                <Button color="success" onClick={this.togglePopUp}>Podsumowanie</Button>
             </Container>
         );
     }
-}
+} export default connect()(Batches);
 
-
-export default connect()(Batches);
+/*
+<Row>
+    <Col>
+        <FormGroup>
+            <Button className="btn btn-primary" type="button" onClick={this.handleRedirect}>Przejdź do Złozenia zamowienia</Button>
+        </FormGroup>
+    </Col>
+</Row>
+*/

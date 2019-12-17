@@ -58,11 +58,17 @@ class Podsumowanie extends React.Component {
                                 <p>{this.props.suma}</p>
                             </Col>
                         </Row>
+                        {this.props.recepta_need &&
+                        <Row>
+                            Dla tej sprzedaży jest wymagana recepta
+                        </Row>
+                        }
+                        
                     </ModalBody>
                     <ModalFooter>
                         <Row>
                             <Col sm="3">
-                                <Button color="primary" onClick={this.accept}>Ok</Button>
+                                <Button color="success" onClick={this.accept}>Ok</Button>
                             </Col>
                             <Col sm="3">
                             </Col>

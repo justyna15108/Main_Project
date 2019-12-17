@@ -246,7 +246,7 @@ class Show_Partia extends Component {
                     </Row>
                 }
                 <Row>
-                    <Button color="info" onClick={this.handleReturn.bind(this)}>Return</Button>
+                    <Button color="secondary" onClick={this.handleReturn.bind(this)}>Return</Button>
                 </Row>
             </Container>
         );

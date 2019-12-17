@@ -36,6 +36,7 @@ class Create_Zamowienia extends Component {
         this.findHurtowniaName = this.findHurtowniaName.bind(this);
         this.findArtykul = this.findArtykul.bind(this);
         this.findArtykulPrice = this.findArtykulPrice.bind(this);
+        this.findArtykulSellPrice = this.findArtykulSellPrice.bind(this);
         this.refresh = this.refresh.bind(this);
         this.setRowData = this.setRowData.bind(this);
         this.setColumns = this.setColumns.bind(this);
@@ -110,6 +111,18 @@ class Create_Zamowienia extends Component {
         return 1;
     }
 
+    findArtykulSellPrice(id) {
+        var art = this.state.artykuls;
+        for (var i in art) {
+            if (id === art[i].IdArtykul)
+                if (art[i].Partia.length > 0)
+                    return art[i].Partia[0].CenaWSprzedazy;
+                else
+                    return 1;
+        }
+        return 1;
+    }
+
     onGridReady = params => {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
@@ -157,6 +170,14 @@ class Create_Zamowienia extends Component {
             },
             {
                 headerName: "Cena zakupu", field: "cenaWZakupu", sortable: true, editable: true,
+                valueSetter: function (params) {
+                    let tmp = parseFloat(params.newValue).toFixed(2);
+                    if (isNaN(tmp) || tmp < 0.05) {
+                        tmp = 0.05;
+                    }
+                    return params.data.cenaWZakupu = tmp;
+                },
+
             },
             {
                 headerName: "Liczba w zamowieniu", field: "liczba", sortable: true, editable: true,
@@ -234,7 +255,7 @@ class Create_Zamowienia extends Component {
                         dataWaznosci: new Date(),
                         artykulIdArtukulu: node.data.idArtykul,
                         zamowienieIdZamowienia: data.idZamowienia,
-                        cenaWSprzedazy: 1,
+                        cenaWSprzedazy: this.findArtykulSellPrice(node.data.idArtykul),
                         cenaWZakupu: node.data.cenaWZakupu,
                         liczba: node.data.liczba,
                         liczbaWSprzedazy: node.data.liczba,

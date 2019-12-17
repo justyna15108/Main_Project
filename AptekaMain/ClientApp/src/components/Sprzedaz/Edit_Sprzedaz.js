@@ -85,7 +85,7 @@ class Edit_Sprzedaz extends Component {
 
     refresh() {
         this.props.history.push("/");
-        this.props.history.push("/sprzedaz/" + this.state.IdSprzedaz);
+        this.props.history.push("/sprzedazy");
     }
 
     getShortDate(json_date) {
@@ -172,13 +172,13 @@ class Edit_Sprzedaz extends Component {
             console.log(resp.data);
             this.handleReturn();
         });
-        
+
     }
 
     handleShow(id) {
         console.log("id" + id);
         let url = this.findScan(id);
-        this.setState({chosen_url: url, open: true});
+        this.setState({ chosen_url: url, open: true });
     }
 
     findScan(id) {
@@ -250,32 +250,40 @@ class Edit_Sprzedaz extends Component {
                                     <p>Skany</p>
                                     <Row>
                                         <input type="file" onChange={this.fileChangedHandler} />
-                                        <Button onClick={this.uploadHandler} disabled={!this.state.file_ready} > Upload</Button>
+                                        <Button color="success" onClick={this.uploadHandler} disabled={!this.state.file_ready} > Upload</Button>
                                     </Row>
-                                <Row>
-                                    {this.state.scans.length > 0 &&
-                                        <Table>
-                                        <tbody>
-                                            {this.state.scans.map(sc =>
-                                                <tr key={sc.idScan}>
-                                                    <td>{sc.scanName}</td>
-                                                    <td> <Button onClick={(id) => this.handleShow(sc.idScan)}>Show Scan</Button> </td>
-                                                </tr>
-                                            )}
-                                        </tbody>
+                                    <Row>
+                                        {this.state.scans.length > 0 &&
+                                            <Table>
+                                                <tbody>
+                                                    {this.state.scans.map(sc =>
+                                                        <tr key={sc.idScan}>
+                                                            <td>{sc.scanName}</td>
+                                                            <td> <Button color="info" onClick={(id) => this.handleShow(sc.idScan)}>Show Scan</Button> </td>
+                                                        </tr>
+                                                    )}
+                                                </tbody>
 
 
-                                        </Table>
-                                    }
+                                            </Table>
+                                        }
                                     </Row>
                                 </div>
                             }
                             <Row>
                                 <ReactToPdf targetRef={this.pdfref} filename="sprzedaz.pdf">
                                     {({ toPdf }) => (
-                                        <Button onClick={toPdf}>Generate pdf</Button>
+                                        <Button color="info" onClick={toPdf}>Generate pdf</Button>
                                     )}
                                 </ReactToPdf>
+                            </Row>
+                        </Col>
+                        <Col>
+                            <Row>
+                                <p> </p>
+                            </Row>
+                            <Row>
+                                <Button color="secondary" onClick={this.handleReturn}>Return</Button>
                             </Row>
                         </Col>
                     </Row>
