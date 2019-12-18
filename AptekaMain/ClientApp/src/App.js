@@ -22,6 +22,7 @@ import Hurtownie from './components/Hurtownie/Hurtownie';
 import Edit_Hurtownia from './components/Hurtownie/Edit_Hurtownia';
 import Edit_Sprzedaz from './components/Sprzedaz/Edit_Sprzedaz';
 import Sprzedazy from './components/Sprzedaz/Sprzedazy';
+import Sales_Charts from './components/Charts/Sales_Charts';
 
 
 export default () => (
@@ -47,5 +48,6 @@ export default () => (
         <Route exact path='/hurtownia_edit/:id' component={Edit_Hurtownia} />
         <Route exact path='/sprzedaz/:id' component={Edit_Sprzedaz} />
         <Route exact path='/sprzedazy/' component={Sprzedazy} />
+        <Route exact path='/sales_charts' component={Sales_Charts} />
   </Layout>
 );

@@ -90,6 +90,16 @@ class NavMenu extends React.Component {
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>
+                                <UncontrolledDropdown nav inNavbar>
+                                    <DropdownToggle nav caret>
+                                        Charts
+                                    </DropdownToggle>
+                                    <DropdownMenu right>
+                                        <DropdownItem>
+                                            <NavLink tag={Link} className="text-dark" to="/sales_charts">Sprzedaz</NavLink>
+                                        </DropdownItem>
+                                    </DropdownMenu>
+                                </UncontrolledDropdown>
                                 {!this.props.user.isAuthenticated && 
                                 <NavItem>
                                     <NavLink tag={Link} className="text-dark" to="/login">Login</NavLink>
