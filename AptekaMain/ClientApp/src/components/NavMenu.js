@@ -41,73 +41,83 @@ class NavMenu extends React.Component {
                         <NavbarToggler onClick={this.toggle} className="mr-2" />
                         <Collapse className="d-sm-inline-flex flex-sm-row-reverse" isOpen={this.state.isOpen} navbar>
                             <ul className="navbar-nav flex-grow">
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        Towar
+                                {this.props.auth.isAuthenticated &&
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            Towar
                                     </DropdownToggle>
-                                    <DropdownMenu right>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/artykuls">Artykuły</NavLink>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        Zamowienia
+                                        <DropdownMenu right>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/artykuls">Artykuły</NavLink>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                }
+                                {this.props.auth.isAuthenticated &&
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            Zamowienia
                                     </DropdownToggle>
-                                    <DropdownMenu right>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/lista_brakow_show">Listy Braków</NavLink>
-                                        </DropdownItem>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/create_zamowienie">Nowe Zamowienie</NavLink>
-                                        </DropdownItem>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/zamowienia">Zamowienia</NavLink>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        Sprzedaż
+                                        <DropdownMenu right>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/lista_brakow_show">Listy Braków</NavLink>
+                                            </DropdownItem>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/create_zamowienie">Nowe Zamowienie</NavLink>
+                                            </DropdownItem>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/zamowienia">Zamowienia</NavLink>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                }
+                                {this.props.auth.isAuthenticated &&
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            Sprzedaż
                                     </DropdownToggle>
-                                    <DropdownMenu right>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/batches/1">Sprzedaz w aptece</NavLink>
-                                        </DropdownItem>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/sprzedazy">Sprzedazy</NavLink>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        Administrowanie
+                                        <DropdownMenu right>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/batches/1">Sprzedaz w aptece</NavLink>
+                                            </DropdownItem>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/sprzedazy">Sprzedazy</NavLink>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                }
+                                {this.props.auth.isAuthenticated &&
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            Administrowanie
                                     </DropdownToggle>
-                                    <DropdownMenu right>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
-                                <UncontrolledDropdown nav inNavbar>
-                                    <DropdownToggle nav caret>
-                                        Charts
+                                        <DropdownMenu right>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                }
+                                {this.props.auth.isAuthenticated &&
+                                    <UncontrolledDropdown nav inNavbar>
+                                        <DropdownToggle nav caret>
+                                            Charts
                                     </DropdownToggle>
-                                    <DropdownMenu right>
-                                        <DropdownItem>
-                                            <NavLink tag={Link} className="text-dark" to="/sales_charts">Sprzedaz</NavLink>
-                                        </DropdownItem>
-                                    </DropdownMenu>
-                                </UncontrolledDropdown>
-                                {!this.props.auth.isAuthenticated && 
-                                <NavItem>
-                                    <NavLink tag={Link} className="text-dark" to="/login">Login</NavLink>
-                                </NavItem>
+                                        <DropdownMenu right>
+                                            <DropdownItem>
+                                                <NavLink tag={Link} className="text-dark" to="/sales_charts">Sprzedaz</NavLink>
+                                            </DropdownItem>
+                                        </DropdownMenu>
+                                    </UncontrolledDropdown>
+                                }
+                                {!this.props.auth.isAuthenticated &&
+                                    <NavItem>
+                                        <NavLink tag={Link} className="text-dark" to="/login">Login</NavLink>
+                                    </NavItem>
                                 }
                                 {this.props.auth.isAuthenticated &&
                                     <NavItem>
-                                    <NavLink tag={Link} className="text-dark" to={"/user_edit/" + this.props.auth.user.pracownikIdPracownika}> Twoj Profil </NavLink>
+                                        <NavLink tag={Link} className="text-dark" to={"/user_edit/" + this.props.auth.user.pracownikIdPracownika}> Twoj Profil </NavLink>
                                     </NavItem>
                                 }
                                 {this.props.auth.isAuthenticated &&
