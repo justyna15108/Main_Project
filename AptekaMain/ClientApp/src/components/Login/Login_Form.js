@@ -76,7 +76,7 @@ class Login_Form extends Component {
                         </FormGroup>
                         <FormGroup>
                             <Label htmlFor="password" class="control-label">Password</Label>
-                            <Input type="text" className="form-control" name="password" value={this.state.password} onChange={this.onChange} />
+                            <Input type="password" className="form-control" name="password" value={this.state.password} onChange={this.onChange} />
                             {this.state.password_err.length > 0 && <p>this.state.password_err</p>}
                         </FormGroup>
                         <FormGroup>
@@ -89,6 +89,6 @@ class Login_Form extends Component {
 }
 
 export default connect(
-    state => state.user,
+    state => state.auth,
     dispatch => bindActionCreators(actionCreators, dispatch)
 )(Login_Form);

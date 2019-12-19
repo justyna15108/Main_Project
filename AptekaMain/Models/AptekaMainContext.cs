@@ -24,6 +24,8 @@ namespace AptekaMain.Models
         public virtual DbSet<Partia> Partia { get; set; }
         public virtual DbSet<Pass> Pass { get; set; }
         public virtual DbSet<Photo> Photo { get; set; }
+        public virtual DbSet<Powiadomienie> Powiadomienie { get; set; }
+        public virtual DbSet<PowiadomienieGlobalne> PowiadomienieGlobalne { get; set; }
         public virtual DbSet<Pracownik> Pracownik { get; set; }
         public virtual DbSet<Producent> Producent { get; set; }
         public virtual DbSet<Rabat> Rabat { get; set; }
@@ -263,6 +265,46 @@ namespace AptekaMain.Models
                     .HasForeignKey(d => d.ArtykulIdArtukulu)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("image_artykul_fk");
+            });
+
+            modelBuilder.Entity<Powiadomienie>(entity =>
+            {
+                entity.HasKey(e => e.IdPowiadomienie);
+
+                entity.Property(e => e.IdPowiadomienie).HasColumnName("id_powiadomienie");
+
+                entity.Property(e => e.DataGeneracji)
+                    .HasColumnName("data_generacji")
+                    .HasColumnType("date");
+
+                entity.Property(e => e.Tresc)
+                    .IsRequired()
+                    .HasColumnName("tresc")
+                    .HasMaxLength(200);
+
+                entity.Property(e => e.WydzialIdWydzial).HasColumnName("Wydzial_Id_Wydzial");
+
+                entity.HasOne(d => d.WydzialIdWydzialNavigation)
+                    .WithMany(p => p.Powiadomienie)
+                    .HasForeignKey(d => d.WydzialIdWydzial)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("powiadomienie_wydzial_fk");
+            });
+
+            modelBuilder.Entity<PowiadomienieGlobalne>(entity =>
+            {
+                entity.HasKey(e => e.IdPowiadomienie);
+
+                entity.ToTable("Powiadomienie_globalne");
+
+                entity.Property(e => e.IdPowiadomienie).HasColumnName("id_powiadomienie");
+
+                entity.Property(e => e.Data).HasColumnType("date");
+
+                entity.Property(e => e.Tresc)
+                    .IsRequired()
+                    .HasColumnName("tresc")
+                    .HasMaxLength(200);
             });
 
             modelBuilder.Entity<Pracownik>(entity =>

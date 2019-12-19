@@ -8,6 +8,7 @@ namespace AptekaMain.Models
         public Wydzial()
         {
             Batch = new HashSet<Batch>();
+            Powiadomienie = new HashSet<Powiadomienie>();
             Pracownik = new HashSet<Pracownik>();
         }
 
@@ -16,6 +17,7 @@ namespace AptekaMain.Models
         public string KodPocztowy { get; set; }
 
         public ICollection<Batch> Batch { get; set; }
+        public ICollection<Powiadomienie> Powiadomienie { get; set; }
         public ICollection<Pracownik> Pracownik { get; set; }
     }
 }

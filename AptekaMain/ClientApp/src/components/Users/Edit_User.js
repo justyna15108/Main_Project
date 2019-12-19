@@ -78,6 +78,10 @@ class Edit_User extends Component {
 
     handleDelete() {
         let id = this.state.id;
+        if (id === 1) {
+            window.alert("you cant delete admin");
+        }
+        else 
         if (window.confirm("Do you want to delete User" + id) === true)
             fetch('api/Pracowniks/' + id, {
                 method: 'DELETE'

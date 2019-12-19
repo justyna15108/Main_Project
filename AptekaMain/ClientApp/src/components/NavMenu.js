@@ -100,14 +100,14 @@ class NavMenu extends React.Component {
                                         </DropdownItem>
                                     </DropdownMenu>
                                 </UncontrolledDropdown>
-                                {!this.props.user.isAuthenticated && 
+                                {!this.props.auth.isAuthenticated && 
                                 <NavItem>
                                     <NavLink tag={Link} className="text-dark" to="/login">Login</NavLink>
                                 </NavItem>
                                 }
-                                {this.props.user.isAuthenticated &&
+                                {this.props.auth.isAuthenticated &&
                                     <NavItem>
-                                    <NavLink tag={Link} className="text-dark" to={"/user_edit/"+this.props.user.user.pracownikIdPracownika}> Twoj Profil </NavLink>
+                                    <NavLink tag={Link} className="text-dark" to={"/user_edit/" + this.props.auth.user.pracownikIdPracownika}> Twoj Profil </NavLink>
                                     </NavItem>
                                 }
                             </ul>
@@ -120,7 +120,7 @@ class NavMenu extends React.Component {
 }
 
 function mapStateToProps(state) {
-    return { user: state.user }
+    return { auth: state.auth }
 }
 
 export default connect(mapStateToProps)(NavMenu);

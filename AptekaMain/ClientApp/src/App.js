@@ -23,11 +23,13 @@ import Edit_Hurtownia from './components/Hurtownie/Edit_Hurtownia';
 import Edit_Sprzedaz from './components/Sprzedaz/Edit_Sprzedaz';
 import Sprzedazy from './components/Sprzedaz/Sprzedazy';
 import Sales_Charts from './components/Charts/Sales_Charts';
+import Logout from './components/Login/Logout';
 
 
 export default () => (
   <Layout>
-    <Route exact path='/' component={Home} />
+        <Route exact path='/' component={Home} />
+        <Route exact path='/logout' component={Logout} />
         <Route path='/artykuls' component={Artykuls} />
         <Route exact path='/artykul_edit/:id' component={Edit_Artykul} />
         <Route exact path='/artykul_show/:id' component={ShowArtykul} />

@@ -5,7 +5,7 @@ import * as user_Auth from './user_Auth';
 
 export default function configureStore (history, initialState) {
     const reducers = {
-    user: user_Auth.reducer
+    auth: user_Auth.reducer
   };
 
   const middleware = [
