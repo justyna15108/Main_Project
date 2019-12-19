@@ -110,6 +110,11 @@ class NavMenu extends React.Component {
                                     <NavLink tag={Link} className="text-dark" to={"/user_edit/" + this.props.auth.user.pracownikIdPracownika}> Twoj Profil </NavLink>
                                     </NavItem>
                                 }
+                                {this.props.auth.isAuthenticated &&
+                                    <NavItem>
+                                        <NavLink tag={Link} to="/logout">Logout</NavLink>
+                                    </NavItem>
+                                }
                             </ul>
                         </Collapse>
                     </Container>

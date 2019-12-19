@@ -9,7 +9,7 @@ class Wydzial_Powiadomienia extends Component {
         super(props);
         this.state = {
             powiadomienia: [],
-            page_length: 6,
+            page_length: 5,
             skip: 0,
             limit: 0,
             currentPage: 1,
@@ -56,6 +56,7 @@ class Wydzial_Powiadomienia extends Component {
     render() {
         return (
             <div className="commentBox">
+                <h4>Powiadomienia</h4>
                 <Powiadomienie_List data={this.state.powiadomienia} />
                 <Pagination
                     currentPage={this.state.currentPage}
