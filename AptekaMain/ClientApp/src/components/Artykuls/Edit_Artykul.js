@@ -61,7 +61,7 @@ class Edit_Artykul extends Component {
     handleCreate() {
         this.validateData();
         if (this.state.err > 0) {
-            window.open('Nie wszystkie pola są prawidłowo wypelnione');
+            window.alert('Nie wszystkie pola są prawidłowo wypelnione');
         }
         else {
             fetch("api/Artykuls/", {

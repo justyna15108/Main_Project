@@ -2,6 +2,8 @@
 import { Button, Form, FormGroup, Label, Input, FormText, Table, Row, Container, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import validator from 'validator';
+
 
 class Edit_User extends Component {
     displayName = Edit_User.name
@@ -10,7 +12,7 @@ class Edit_User extends Component {
         super(props);
         this.state = {
             wydzialy: [], loading: true, err: '', disabled: true, mode: 'create',
-            id: '', imie: '', nazwisko: '', email: '', haslo: '', wydzial: '', poziom: 1
+            id: '', imie: '', nazwisko: '', email: '', haslo: '', wydzial: 1, poziom: 1
         };
         const user_id = this.props.match.params.id;
         if (user_id != 0) {
@@ -92,7 +94,12 @@ class Edit_User extends Component {
         setTimeout(this.refresh, 300);
     }
 
-
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.imie !== this.state.imie || prevState.nazwisko !== this.state.nazwisko || prevState.email !== this.state.email ||
+            prevState.haslo !== this.state.haslo || prevState.wydzial !== this.state.wydzial || prevState.poziom !== this.state.poziom  ) {
+            this.validateData();
+        }
+    }
 
     refresh() {
         this.props.history.push("/users");
@@ -131,14 +138,14 @@ class Edit_User extends Component {
     validateData() {
         this.setState({ err: "", disabled: false });
         if (this.state.imie.length <= 1)
-            this.setState({ err: "Imie nie moż być krótrsza od 1 znaków", disabled: true });
+            this.setState({ err: "Imie nie może być krótrsza od 2 znaków", disabled: true });
         if (this.state.nazwisko.length <= 1)
-            this.setState({ err: "Nazwisko nie moż być krótrsze od 1 znaków", disabled: true });
-        if (this.state.email < 5)
-            this.setState({ err: "email nie moż być krótrszy od 1 znaków", disabled: true });
-        if (this.state.wydzial == null)
+            this.setState({ err: "Nazwisko nie może być krótrsze od 2 znaków", disabled: true });
+        if (!validator.isEmail(this.state.email))
+            this.setState({ err: "Nieprawidłowy email", disabled: true });
+        if (this.state.wydzial === null)
             this.setState({ err: "Wybierz Wydzial", disabled: true });
-        if (this.state.poziom == null)
+        if (this.state.poziom === null)
             this.setState({ err: "Wybierz poziom", disabled: true });
 
     }

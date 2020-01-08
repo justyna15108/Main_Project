@@ -120,6 +120,8 @@ namespace AptekaMain.Controllers
                 return NotFound();
             }
 
+            var pass = await _context.Pass.SingleOrDefaultAsync(u => u.IdPracownika == pracownik.IdPracownika);
+            _context.Pass.Remove(pass);
             _context.Pracownik.Remove(pracownik);
             await _context.SaveChangesAsync();
 

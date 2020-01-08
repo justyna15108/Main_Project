@@ -248,8 +248,8 @@ class Edit_Sprzedaz extends Component {
                                 <div>
                                     <p>Skany</p>
                                     <Row>
-                                        <input type="file" onChange={this.fileChangedHandler} />
-                                        <Button color="success" onClick={this.uploadHandler} disabled={!this.state.file_ready} > Upload</Button>
+                                    <input type="file" onChange={this.fileChangedHandler} accept="image/*" />
+                                        <Button color="success" onClick={this.uploadHandler} disabled={!this.state.file_ready}> Dodaj Skan</Button>
                                     </Row>
                                     <Row>
                                         {this.state.scans.length > 0 &&
@@ -258,7 +258,7 @@ class Edit_Sprzedaz extends Component {
                                                     {this.state.scans.map(sc =>
                                                         <tr key={sc.idScan}>
                                                             <td>{sc.scanName}</td>
-                                                            <td> <Button color="info" onClick={(id) => this.handleShow(sc.idScan)}>Show Scan</Button> </td>
+                                                            <td> <Button color="info" onClick={(id) => this.handleShow(sc.idScan)}>Pokaż Skan</Button> </td>
                                                         </tr>
                                                     )}
                                                 </tbody>
@@ -272,7 +272,7 @@ class Edit_Sprzedaz extends Component {
                             <Row>
                                 <ReactToPdf targetRef={this.pdfref} filename="sprzedaz.pdf">
                                     {({ toPdf }) => (
-                                        <Button color="info" onClick={toPdf}>Generate pdf</Button>
+                                        <Button color="info" onClick={toPdf}>Generowanie PDF</Button>
                                     )}
                                 </ReactToPdf>
                             </Row>
@@ -282,7 +282,7 @@ class Edit_Sprzedaz extends Component {
                                 <p> </p>
                             </Row>
                             <Row>
-                                <Button color="secondary" onClick={this.handleReturn}>Return</Button>
+                                <Button color="secondary" onClick={this.handleReturn}>Powrót</Button>
                             </Row>
                         </Col>
                     </Row>

@@ -68,12 +68,12 @@ class Podsumowanie extends React.Component {
                     <ModalFooter>
                         <Row>
                             <Col sm="3">
-                                <Button color="success" onClick={this.accept}>Ok</Button>
+                                <Button color="success" onClick={this.accept}>Zapisz Sprzedaż</Button>
                             </Col>
                             <Col sm="3">
                             </Col>
                             <Col sm="3">
-                                <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                                <Button color="secondary" onClick={this.toggle}>Powrót</Button>
                             </Col>
                         </Row>
                     </ModalFooter>

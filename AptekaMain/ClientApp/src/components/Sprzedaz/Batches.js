@@ -79,7 +79,7 @@ class Batches extends Component {
             .then(data => {
                 this.setState({ artykuls: data });
             });
-        await fetch('api/Rabats')
+        await fetch("api/Rabats?$filter=czyJestAktywny eq '1'")
             .then(response => response.json())
             .then(data => {
                 this.setState({ rabats: data });
@@ -388,11 +388,16 @@ class Batches extends Component {
     }
 
     togglePopUp() {
-        this.create_list();
-        this.setState({ open: true });
-        let rn = this.get_recepta_need();
-        console.log(rn);
-        this.setState({ recepta_need: rn })
+        let list = this.create_list();
+        if (list.length < 1) {
+            window.alert('Brak artukułow w sprzedaży');
+        }
+        else {
+            this.setState({ open: true });
+            let rn = this.get_recepta_need();
+            console.log(rn);
+            this.setState({ recepta_need: rn })
+        }
     }
 
     hide() {
@@ -420,6 +425,7 @@ class Batches extends Component {
             l.push(row);
         });
         this.setState({ list: l });
+        return l;
     }
 
     handleAccept() {

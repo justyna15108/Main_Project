@@ -82,7 +82,10 @@ class NavMenu extends React.Component {
                                             </DropdownItem>
                                             <DropdownItem>
                                                 <NavLink tag={Link} className="text-dark" to="/sprzedazy">Sprzedazy</NavLink>
-                                            </DropdownItem>
+                                        </DropdownItem>
+                                        <DropdownItem>
+                                            <NavLink tag={Link} className="text-dark" to="/rabats">Rabaty</NavLink>
+                                        </DropdownItem>
                                         </DropdownMenu>
                                     </UncontrolledDropdown>
                                 }
@@ -93,7 +96,7 @@ class NavMenu extends React.Component {
                                     </DropdownToggle>
                                         <DropdownMenu right>
                                             <DropdownItem>
-                                                <NavLink tag={Link} className="text-dark" to="/users">Users</NavLink>
+                                                <NavLink tag={Link} className="text-dark" to="/users">Uzytkowniki</NavLink>
                                             </DropdownItem>
                                         </DropdownMenu>
                                     </UncontrolledDropdown>

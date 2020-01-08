@@ -24,6 +24,7 @@ import Edit_Sprzedaz from './components/Sprzedaz/Edit_Sprzedaz';
 import Sprzedazy from './components/Sprzedaz/Sprzedazy';
 import Sales_Charts from './components/Charts/Sales_Charts';
 import Logout from './components/Login/Logout';
+import Rabats from './components/Rabat/Rabats';
 
 
 export default () => (
@@ -51,5 +52,6 @@ export default () => (
         <Route exact path='/sprzedaz/:id' component={Edit_Sprzedaz} />
         <Route exact path='/sprzedazy/' component={Sprzedazy} />
         <Route exact path='/sales_charts' component={Sales_Charts} />
+        <Route exact path='/rabats' component={Rabats} />
   </Layout>
 );
