@@ -121,11 +121,18 @@ class Artykuls extends Component {
                 },
             {
                 headerName: "Wymagana recepta?", field: "wymaganaRecepta",sortable: true
-            },
-            {
-                headerName: "Edit", field: "idArtykul", cellRenderer: "editRenderer", colId: "edit"
             }
         ]
+        if (this.props.auth.isAuthenticated && this.props.auth.user.access > 1) {
+            cols.push({
+                headerName: "Edit", field: "idArtykul", cellRenderer: "editRenderer", colId: "edit"
+            });
+        }
+        else {
+            cols.push({
+                headerName: "Edit", field: "idArtykul", cellRenderer: "editRenderer", colId: "edit", hide: true
+            });
+        }
         return cols;
     }
 
@@ -165,13 +172,18 @@ class Artykuls extends Component {
                     rowSelection={this.state.rowSelection}
                     onSelectionChanged={this.onSelectionChanged.bind(this)}
                 />
-                <FormGroup>
-                    <Button color="success" onClick={this.handleCreate}>Create new</Button>
-                </FormGroup>
+                {(this.props.auth.isAuthenticated && this.props.auth.user.access > 1) &&
+                    <FormGroup>
+                        <Button color="success" onClick={this.handleCreate}>Dodaj Nowy</Button>
+                    </FormGroup>
+                }
             </div>
         );
     }
 }
 
+function mapStateToProps(state) {
+    return { auth: state.auth }
+}
 
-export default connect()(Artykuls);
+export default connect(mapStateToProps)(Artykuls);

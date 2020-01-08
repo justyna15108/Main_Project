@@ -2,6 +2,7 @@
 import { Button, Form, FormGroup, Label, Input, FormText, Table, Row, Col, Container } from 'reactstrap';
 import { connect } from 'react-redux';
 import axios from 'axios';
+import validator from 'validator';
 
 class Edit_Artykul extends Component {
     displayName = Edit_Artykul.name
@@ -12,13 +13,24 @@ class Edit_Artykul extends Component {
             kategorias: [], producents: [], loading: true, err: '', disabled: true, mode: 'create',
             id: '', nazwa: '', kod: '', illoscPodstawowa: 0, illoscProduktow: 0, wymaganaRecepta: false, kategoria: '', producent: ''
         };
+
+        this.refresh = this.refresh.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
+        this.validateData = this.validateData.bind(this);
+        this.handleDelete = this.handleDelete.bind(this);
+        this.handleReturn = this.handleReturn.bind(this);
+        this.handleCreate = this.handleCreate.bind(this);
+    }
+
+    componentDidMount() {
         const art_id = this.props.match.params.id;
         if (art_id != 0) {
             fetch('api/Artykuls/' + art_id)
                 .then(response => response.json())
                 .then(data => {
                     this.setState({
-                        id: data.idArtykul, nazwa: data.nazwa, kod: data.kod, illoscProduktow: data.illoscProduktow,
+                        id: data.idArtykul, nazwa: data.nazwa, kod: data.kod+'', illoscProduktow: data.illoscProduktow,
                         illoscPodstawowa: data.illoscPodstawowa, kategoria: data.kategoriaIdKategoria, producent: data.producentIdProducent,
                         wymaganaRecepta: data.wymaganaRecepta, mode: 'edit'
                     });
@@ -35,58 +47,69 @@ class Edit_Artykul extends Component {
             .then(data => {
                 this.setState({ kategorias: data, loading: false });
             });
-
-        this.refresh = this.refresh.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.handleUpdate = this.handleUpdate.bind(this);
-        this.validateData = this.validateData.bind(this);
-        this.handleDelete = this.handleDelete.bind(this);
-        this.handleReturn = this.handleReturn.bind(this);
-        this.handleCreate = this.handleCreate.bind(this);
     }
 
-    handleCreate() {
-        fetch("api/Artykuls/", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                nazwa: this.state.nazwa,
-                kod: this.state.kod,
-                illoscProduktow: this.state.illoscProduktow,
-                illoscPodstawowa: this.state.illoscPodstawowa,
-                kategoriaIdKategoria: this.state.kategoria,
-                producentIdProducent: this.state.producent,
-                wymaganaRecepta: this.state.wymaganaRecepta
-            })
-        }).then(setTimeout(this.refresh, 300));
+    componentDidUpdate(prevProps,prevState) {
+        if (prevState.kod !== this.state.kod || prevState.nazwa !== this.state.nazwa || prevState.illoscPodstawowa !== this.state.illoscPodstawowa ||
+            prevState.kategoria !== this.state.kategoria || prevState.producent !== this.state.producent) {
+            this.validateData();
+        }
+    }
 
+
+
+    handleCreate() {
+        this.validateData();
+        if (this.state.err > 0) {
+            window.open('Nie wszystkie pola są prawidłowo wypelnione');
+        }
+        else {
+            fetch("api/Artykuls/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nazwa: this.state.nazwa,
+                    kod: this.state.kod,
+                    illoscProduktow: this.state.illoscProduktow,
+                    illoscPodstawowa: this.state.illoscPodstawowa,
+                    kategoriaIdKategoria: this.state.kategoria,
+                    producentIdProducent: this.state.producent,
+                    wymaganaRecepta: this.state.wymaganaRecepta
+                })
+            }).then(setTimeout(this.refresh, 300));
+        }
     }
 
     handleUpdate() {
-
-        fetch("api/Artykuls/" + this.state.id, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                idArtykul: this.state.id,
-                nazwa: this.state.nazwa,
-                kod: this.state.kod,
-                illoscProduktow: this.state.illoscProduktow,
-                illoscPodstawowa: this.state.illoscPodstawowa,
-                kategoriaIdKategoria: this.state.kategoria,
-                producentIdProducent: this.state.producent,
-                wymaganaRecepta: this.state.wymaganaRecepta
-            })
-        }).then(setTimeout(this.refresh, 300));
+        this.validateData();
+        if (this.state.err > 0) {
+            window.open('Nie wszystkie pola są prawidłowo wypelnione');
+        }
+        else {
+            fetch("api/Artykuls/" + this.state.id, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idArtykul: this.state.id,
+                    nazwa: this.state.nazwa,
+                    kod: this.state.kod,
+                    illoscProduktow: this.state.illoscProduktow,
+                    illoscPodstawowa: this.state.illoscPodstawowa,
+                    kategoriaIdKategoria: this.state.kategoria,
+                    producentIdProducent: this.state.producent,
+                    wymaganaRecepta: this.state.wymaganaRecepta
+                })
+            }).then(setTimeout(this.refresh, 300));
+        }
     }
 
     handleDelete() {
         let id = this.state.id;
-        if (window.confirm("Do you want to delete Artykul" + id) === true)
+        if (window.confirm("Czy na pewno chcesz usunąc Artykul" + id) === true)
             fetch('api/Artykuls/' + id, {
                 method: 'DELETE'
             }).then(setTimeout(this.refresh, 300));
@@ -129,20 +152,23 @@ class Edit_Artykul extends Component {
                 console.log("Unknown");
                 break;
         }
-        this.validateData();
     }
 
     validateData() {
         this.setState({ err: "", disabled: false });
-        if (this.state.nazwa.length <= 3)
+        if (this.state.nazwa.length < 3)
             this.setState({ err: "Nazwa nie moż być krótrsza od 3 znaków", disabled: true });
-        if (this.state.kod.length <= 3)
+        if (!validator.isAlphanumeric(this.state.nazwa))
+            this.setState({ err: "nazwa powinna zawierac tylko litery i cyfry", disabled: true });
+        if (this.state.kod.length < 3)
             this.setState({ err: "kod nie moż być krótrsza od 3 znaków", disabled: true });
+        if (!validator.isDecimal(this.state.kod))
+            this.setState({ err: "kod może zawierać tylko cyfry", disabled: true });
         if (this.state.illosc < 0)
             this.setState({ err: "Illosc nie moze byc ujemna", disabled: true });
-        if (this.state.kategoria == null)
+        if (this.state.kategoria === "")
             this.setState({ err: "Wybierz Kategorije", disabled: true });
-        if (this.state.kategoria == null)
+        if (this.state.producent === "")
             this.setState({ err: "Wybierz Producenta", disabled: true });
 
     }

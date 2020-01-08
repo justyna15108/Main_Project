@@ -204,21 +204,21 @@ class Edit_User extends Component {
                         <Row>
                             {this.state.mode === "edit" &&
                                     <Col>
-                                <Button color="info" onClick={this.handleUpdate} disabled={this.state.disabled}>Save User</Button>
+                                <Button color="info" onClick={this.handleUpdate} disabled={this.state.disabled}>Zapisz zmiany</Button>
                                     </Col>
                             }
                             {this.state.mode === "edit" &&
                                 <Col>
-                                <Button color="danger" onClick={this.handleDelete}>Delete User</Button>
+                                <Button color="danger" onClick={this.handleDelete}>Usuń użytkownika</Button>
                                 </Col>
                             }
                             <Col>
                                 {this.state.mode === "create" &&
-                                    <Button color="success" onClick={this.handleCreate} disabled={this.state.disabled}>Create User</Button>
+                                    <Button color="success" onClick={this.handleCreate} disabled={this.state.disabled}>Stwórz użytkownika</Button>
                                 }
                             </Col>
                             <Col>
-                                <Button color="secondary" onClick={this.handleReturn}>Return</Button>
+                                <Button color="secondary" onClick={this.handleReturn}>Powrot</Button>
                             </Col>
                         </Row>
                     </Col>

@@ -156,7 +156,7 @@ class Users extends Component {
                     onSelectionChanged={this.onSelectionChanged.bind(this)}
                 />
                 <FormGroup>
-                    <Button className="btn btn-primary" type="button" onClick={this.handleCreate}>Create new</Button>
+                    <Button className="btn btn-primary" type="button" onClick={this.handleCreate}>Dodaj Użytkownika</Button>
                 </FormGroup>
             </div>
         );

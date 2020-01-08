@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import { Button, Form, FormGroup, Label, Input, FormText, Table } from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormText, Table, Row, Col } from 'reactstrap';
 import { connect } from 'react-redux';
 import axios from 'axios';
 
@@ -67,37 +67,32 @@ class ShowArtykul extends Component {
     renderArtykulsForm() {
         return (
             <Form>
-                <FormGroup>
-                    <Label htmlFor="nazwa">Nazwa</Label>
-                    <Input type="text" className="form-control" name="nazwa" value={this.state.nazwa}/>
-                </FormGroup>
-                <FormGroup>
-                    <Label htmlFor="nazwa">Nazwa</Label>
-                    <Input type="kod" className="form-control" name="kod" value={this.state.kod} />
-                </FormGroup>
-                <FormGroup>
-                    <Label htmlFor="illoscProduktow">Illosc Produktow</Label>
-                    <Input type="number" className="form-control" name="illoscProduktow" value={this.state.illoscProduktow}/>
-                </FormGroup>
-                <FormGroup>
-                    <Label htmlFor="illosc">Illosc Podstawowa</Label>
-                    <Input type="number" className="form-control" name="illosc" value={this.state.illoscPodstawowa}/>
-                </FormGroup>
-                <FormGroup>
-                    <Label htmlFor="kategoria">kategoria</Label>
-                    <Input type="text" className="form-control" name="kategoria" value={this.findKategoriaName(this.state.kategoria)} />
-                </FormGroup>
-                <FormGroup>
-                    <Label htmlFor="producent">Producent</Label>
-                    <Input type="text" className="form-control" name="producent" value={this.findProducentName(this.state.producent)} />
-                </FormGroup>
-                <FormGroup>
-                    <Label htmlFor="wymaganaRecepta">Czy jest Wymagana Recepta</Label>
-                    <Input type="checkbox" className="form-control" name="wymaganaRecepta" value={this.state.wymaganaRecepta}/>
-                </FormGroup>
-                <FormGroup>
-                    <Button className="btn btn-primary" type="button" onClick={this.handleReturn}>Return</Button>
-                </FormGroup>
+                <Row>
+                    <p>Nazwa:  {'  '} {this.state.nazwa}</p>
+                </Row>
+                <Row>
+                    <p>Kod:  {'   '} {this.state.kod} </p>
+                </Row>
+                <Row>
+                    <p>Illosc Produktow:   {this.state.illoscProduktow} </p>
+                </Row>
+                <Row>
+                    <p>Illosc Podstawowa:   {this.state.illoscPodstawowa} </p>
+                </Row>
+                <Row>
+                    <p>Kategoria:   {this.findKategoriaName(this.state.kategoria)} </p>
+                </Row>
+                <Row>
+                    <p>Producent:   {this.findProducentName(this.state.producent)} </p>
+                </Row>
+                <Row>
+                    <p>Czy jest Wymagana Recepta:   {this.state.wymaganaRecepta ? "Tak" : "Nie"} </p>
+                </Row>
+                <Row>
+                    <FormGroup>
+                        <Button className="btn btn-primary" type="button" onClick={this.handleReturn}>Powrót</Button>
+                    </FormGroup>
+                </Row>
             </Form>
         );
     }

@@ -6,7 +6,6 @@ import { AgGridReact } from 'ag-grid-react';
 import ReactToPdf from 'react-to-pdf';
 import Scan_Preview from './Scan_Preview';
 import 'ag-grid-community/dist/styles/ag-theme-fresh.css';
-import { Document } from 'react-pdf'
 import { pdfjs } from 'react-pdf';
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 const ref = React.createRef();

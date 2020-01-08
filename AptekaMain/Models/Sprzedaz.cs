@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AptekaMain.Models
 {
@@ -12,6 +13,7 @@ namespace AptekaMain.Models
         }
 
         public int IdSprzedaz { get; set; }
+        [Column(TypeName="datetime")]
         public DateTime? DataSprzedazy { get; set; }
         public int? RabatIdRabatu { get; set; }
         public string TypOplaty { get; set; }

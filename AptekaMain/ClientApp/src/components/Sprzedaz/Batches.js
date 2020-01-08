@@ -323,6 +323,9 @@ class Batches extends Component {
                 this.setState({ rabat: value });
                 setTimeout(this.handlesumUpdate, 100);
                 break;
+            case 'typOplaty':
+                this.setState({ typOplaty: value });
+                break;
             default:
                 console.log("Unknown");
                 break;
@@ -479,12 +482,12 @@ class Batches extends Component {
 
     check_recepta_need() {
         this.gridApi2.forEachNode(node => {
-            if (node.data.WymaganaRecepta==true)
+            if (node.data.WymaganaRecepta == true)
                 return true;
         });
         return false;
     }
-     
+
     render() {
         var date = new Date(this.state.lista.DataGen);
         //var comp = numericCellEditor: NumericCellEditor};
@@ -533,11 +536,11 @@ class Batches extends Component {
                                 onCellEditingStopped={this.onCellEditingStopped.bind(this)}
                                 suppressRowClickSelection={true}
                                 onCellClicked={function (e) {
-                                    if (e.column.colId == 'delete') { // cell is from non-select column
+                                    if (e.column.colId == 'delete') {
                                         e.node.setSelected(true)
                                     }
-                                }}                           
-                         />
+                                }}
+                            />
                         </div>
                     </Col>
                 </Row>
@@ -550,6 +553,15 @@ class Batches extends Component {
                             {this.state.rabats.map(rabat =>
                                 <option key={rabat.idRabat} value={rabat.idRabat} >{rabat.procentRabatu}%</option>
                             )}
+                        </select>
+                    </Col>
+                    <Col sm="1">
+                        Typ Oplaty:
+                    </Col>
+                    <Col sm="2">
+                        <select className="form-control" name="typOplaty" value={this.state.typOplaty} onChange={this.handleInputChange}>
+                            <option key={"Gotówka"} value="Gotówka" >Gotówka</option>
+                            <option key={"Karta"} value="Karta" >Karta</option>
                         </select>
                     </Col>
                 </Row>
@@ -565,7 +577,7 @@ class Batches extends Component {
                     }}
                     />
                 }
-                <Podsumowanie isopen={this.state.open} recepta_need={this.state.recepta_need} hide = { this.hide } list={this.state.list} suma={this.state.suma} accept={this.handleAccept} />
+                <Podsumowanie isopen={this.state.open} recepta_need={this.state.recepta_need} hide={this.hide} list={this.state.list} suma={this.state.suma} accept={this.handleAccept} />
                 <Button color="success" onClick={this.togglePopUp}>Podsumowanie</Button>
             </Container>
         );
